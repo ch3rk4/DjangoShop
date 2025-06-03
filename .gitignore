@@ -6,19 +6,22 @@ __pycache__/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-media/
+media/                    # Пользовательские загрузки (могут быть большими)
+
+# Environment variables
+.env                      # Содержит реальные секреты - НИКОГДА не коммитим!
 
 # Virtual environment
 venv/
 env/
 ENV/
 
-# IDE
+# IDE files
 .idea/
 .vscode/
 *.swp
 *.swo
 
-# OS
+# OS generated files
 .DS_Store
 Thumbs.db
