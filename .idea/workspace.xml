@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="connect to database and create superuser" />
+    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="create fixtures" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -118,7 +118,31 @@
       <option name="project" value="LOCAL" />
       <updated>1748950091219</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="create admin panel">
+      <option name="closed" value="true" />
+      <created>1748950308541</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1748950308541</updated>
+    </task>
+    <task id="LOCAL-00008" summary="create views">
+      <option name="closed" value="true" />
+      <created>1748950378135</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1748950378135</updated>
+    </task>
+    <task id="LOCAL-00009" summary="create fixtures">
+      <option name="closed" value="true" />
+      <created>1748950497879</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1748950497879</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -128,6 +152,9 @@
     <MESSAGE value="refresh files" />
     <MESSAGE value="create models" />
     <MESSAGE value="connect to database and create superuser" />
-    <option name="LAST_COMMIT_MESSAGE" value="connect to database and create superuser" />
+    <MESSAGE value="create admin panel" />
+    <MESSAGE value="create views" />
+    <MESSAGE value="create fixtures" />
+    <option name="LAST_COMMIT_MESSAGE" value="create fixtures" />
   </component>
 </project>
