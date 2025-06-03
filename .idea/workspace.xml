@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="final">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="gitignore">
+      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -168,7 +168,15 @@
       <option name="project" value="LOCAL" />
       <updated>1748951838959</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="gitignore">
+      <option name="closed" value="true" />
+      <created>1748952127965</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1748952127966</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -184,6 +192,7 @@
     <MESSAGE value="create custom commands" />
     <MESSAGE value="refresh home.html" />
     <MESSAGE value="final" />
-    <option name="LAST_COMMIT_MESSAGE" value="final" />
+    <MESSAGE value="gitignore" />
+    <option name="LAST_COMMIT_MESSAGE" value="gitignore" />
   </component>
 </project>
