@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="create fixtures" />
+    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="refresh home.html">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -142,7 +144,23 @@
       <option name="project" value="LOCAL" />
       <updated>1748950497879</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="create custom commands">
+      <option name="closed" value="true" />
+      <created>1748950667535</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1748950667535</updated>
+    </task>
+    <task id="LOCAL-00011" summary="refresh home.html">
+      <option name="closed" value="true" />
+      <created>1748950756094</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1748950756094</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -155,6 +173,8 @@
     <MESSAGE value="create admin panel" />
     <MESSAGE value="create views" />
     <MESSAGE value="create fixtures" />
-    <option name="LAST_COMMIT_MESSAGE" value="create fixtures" />
+    <MESSAGE value="create custom commands" />
+    <MESSAGE value="refresh home.html" />
+    <option name="LAST_COMMIT_MESSAGE" value="refresh home.html" />
   </component>
 </project>
