@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="create product_detail" />
+    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="refresh contacts">
+      <change beforePath="$PROJECT_DIR$/poetry.lock" beforeDir="false" afterPath="$PROJECT_DIR$/poetry.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -246,7 +249,23 @@
       <option name="project" value="LOCAL" />
       <updated>1749032851700</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="create add_product">
+      <option name="closed" value="true" />
+      <created>1749032932086</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1749032932086</updated>
+    </task>
+    <task id="LOCAL-00024" summary="refresh contacts">
+      <option name="closed" value="true" />
+      <created>1749032978800</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1749032978800</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -271,6 +290,8 @@
     <MESSAGE value="refresh base" />
     <MESSAGE value="refresh home" />
     <MESSAGE value="create product_detail" />
-    <option name="LAST_COMMIT_MESSAGE" value="create product_detail" />
+    <MESSAGE value="create add_product" />
+    <MESSAGE value="refresh contacts" />
+    <option name="LAST_COMMIT_MESSAGE" value="refresh contacts" />
   </component>
 </project>
