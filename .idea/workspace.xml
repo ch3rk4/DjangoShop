@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="gitignore2">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="refresh urls" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -23,7 +21,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="HW1" />
+        <entry key="$PROJECT_DIR$" value="HW2" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -53,7 +51,7 @@
   "keyToString": {
     "DefaultHtmlFileTemplate": "HTML File",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "#3 on HW2"
+    "git-widget-placeholder": "HW3"
   }
 }]]></component>
   <component name="SharedIndexes">
@@ -192,7 +190,31 @@
       <option name="project" value="LOCAL" />
       <updated>1748952944015</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="refresh views">
+      <option name="closed" value="true" />
+      <created>1749032324822</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1749032324822</updated>
+    </task>
+    <task id="LOCAL-00017" summary="create forms">
+      <option name="closed" value="true" />
+      <created>1749032376767</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1749032376767</updated>
+    </task>
+    <task id="LOCAL-00018" summary="refresh urls">
+      <option name="closed" value="true" />
+      <created>1749032524609</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1749032524609</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -210,6 +232,9 @@
     <MESSAGE value="final" />
     <MESSAGE value="gitignore" />
     <MESSAGE value="gitignore2" />
-    <option name="LAST_COMMIT_MESSAGE" value="gitignore2" />
+    <MESSAGE value="refresh views" />
+    <MESSAGE value="create forms" />
+    <MESSAGE value="refresh urls" />
+    <option name="LAST_COMMIT_MESSAGE" value="refresh urls" />
   </component>
 </project>
