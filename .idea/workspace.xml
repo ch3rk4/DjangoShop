@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="create admin from blog">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="fixes for migrates" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -296,11 +294,18 @@
       <option name="project" value="LOCAL" />
       <updated>1749473230042</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="fixes for migrates">
+      <option name="closed" value="true" />
+      <created>1749474237637</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1749474237637</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="base for HW2" />
     <MESSAGE value="refresh files" />
     <MESSAGE value="create models" />
     <MESSAGE value="connect to database and create superuser" />
@@ -325,6 +330,7 @@
     <MESSAGE value="create blog and refresh settings" />
     <MESSAGE value="create models from blog" />
     <MESSAGE value="create admin from blog" />
-    <option name="LAST_COMMIT_MESSAGE" value="create admin from blog" />
+    <MESSAGE value="fixes for migrates" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixes for migrates" />
   </component>
 </project>
