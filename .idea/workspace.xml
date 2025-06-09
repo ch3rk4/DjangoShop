@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="fixes for migrates" />
+    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="create urls for blog" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -302,12 +302,42 @@
       <option name="project" value="LOCAL" />
       <updated>1749474237637</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="refresh views">
+      <option name="closed" value="true" />
+      <created>1749474353168</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1749474353168</updated>
+    </task>
+    <task id="LOCAL-00031" summary="refresh urls">
+      <option name="closed" value="true" />
+      <created>1749474399551</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1749474399551</updated>
+    </task>
+    <task id="LOCAL-00032" summary="create views from blog">
+      <option name="closed" value="true" />
+      <created>1749474508994</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1749474508994</updated>
+    </task>
+    <task id="LOCAL-00033" summary="create urls for blog">
+      <option name="closed" value="true" />
+      <created>1749474561020</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1749474561021</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="refresh files" />
-    <MESSAGE value="create models" />
     <MESSAGE value="connect to database and create superuser" />
     <MESSAGE value="create admin panel" />
     <MESSAGE value="create views" />
@@ -317,9 +347,7 @@
     <MESSAGE value="final" />
     <MESSAGE value="gitignore" />
     <MESSAGE value="gitignore2" />
-    <MESSAGE value="refresh views" />
     <MESSAGE value="create forms" />
-    <MESSAGE value="refresh urls" />
     <MESSAGE value="create mask for menu" />
     <MESSAGE value="refresh base" />
     <MESSAGE value="refresh home" />
@@ -331,6 +359,10 @@
     <MESSAGE value="create models from blog" />
     <MESSAGE value="create admin from blog" />
     <MESSAGE value="fixes for migrates" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixes for migrates" />
+    <MESSAGE value="refresh views" />
+    <MESSAGE value="refresh urls" />
+    <MESSAGE value="create views from blog" />
+    <MESSAGE value="create urls for blog" />
+    <option name="LAST_COMMIT_MESSAGE" value="create urls for blog" />
   </component>
 </project>
