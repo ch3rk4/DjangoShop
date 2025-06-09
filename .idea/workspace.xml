@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="create blog and refresh settings">
-      <change beforePath="$PROJECT_DIR$/blog/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/blog/models.py" afterDir="false" />
+    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="create admin from blog">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -280,12 +280,26 @@
       <option name="project" value="LOCAL" />
       <updated>1749473060441</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="create models from blog">
+      <option name="closed" value="true" />
+      <created>1749473177339</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1749473177340</updated>
+    </task>
+    <task id="LOCAL-00028" summary="create admin from blog">
+      <option name="closed" value="true" />
+      <created>1749473230042</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1749473230042</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="new_proj" />
-    <MESSAGE value="base from HW1" />
     <MESSAGE value="base for HW2" />
     <MESSAGE value="refresh files" />
     <MESSAGE value="create models" />
@@ -309,6 +323,8 @@
     <MESSAGE value="refresh contacts" />
     <MESSAGE value="fixes" />
     <MESSAGE value="create blog and refresh settings" />
-    <option name="LAST_COMMIT_MESSAGE" value="create blog and refresh settings" />
+    <MESSAGE value="create models from blog" />
+    <MESSAGE value="create admin from blog" />
+    <option name="LAST_COMMIT_MESSAGE" value="create admin from blog" />
   </component>
 </project>
