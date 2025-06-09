@@ -1,0 +1,37 @@
+<!-- Наследуем основную структуру от catalog -->
+{% extends "catalog/includes/base.html" %}
+
+<!-- Переопределяем или добавляем специфичные для блога стили -->
+{% block extra_css %}
+    {{ block.super }}
+    <style>
+        .blog-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .blog-post {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        .blog-post-title {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .blog-post-meta {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+    </style>
+{% endblock %}
+
+<!-- Определяем дополнительный блок для навигации блога -->
+{% block extra_nav %}
+    <nav class="blog-nav">
+        <a href="{% url 'blog:post_list' %}">Все статьи</a>
+        <!-- Здесь можно добавить другие разделы блога -->
+    </nav>
+{% endblock %}
