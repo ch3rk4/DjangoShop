@@ -1,123 +1,74 @@
-from django.shortcuts import render, get_object_or_404
-from django.contrib import messages
-from django.core.paginator import Paginator
-from django.http import HttpResponseRedirect
-from django.urls import reverse
-from .models import Product, Category
-from .forms import ProductForm
+from django.views.generic import ListView, DetailView, TemplateView
+from .models import Product
 
 
-def home(request):
+class HomeView(ListView):
     """
-    Контроллер для отображения главной страницы с пагинацией.
-
-    Теперь включает постраничное отображение товаров для лучшей навигации
-    по большому каталогу товаров.
+    Главная страница с отображением товаров.
     """
-    # Получаем все товары с оптимизированным запросом
-    products_list = Product.objects.select_related('category').all()
+    model = Product
+    template_name = 'catalog/index.html'
+    context_object_name = 'products'
+    paginate_by = 12
 
-    # Настройка пагинации - по 6 товаров на страницу
-    paginator = Paginator(products_list, 6)
-    page_number = request.GET.get('page')
-    products = paginator.get_page(page_number)
+    def get_queryset(self):
+        """
+        Определяет, какие товары показывать.
+        """
+        queryset = Product.objects.all()
 
-    # Дополнительное задание из ДЗ2: выводим последние 5 товаров в консоль
-    latest_products = Product.objects.select_related('category').order_by('-created_at')[:5]
+        search_query = self.request.GET.get('search')
+        if search_query:
+            queryset = queryset.filter(name__icontains=search_query)
 
-    print("=== ПОСЛЕДНИЕ 5 СОЗДАННЫХ ТОВАРОВ ===")
-    for product in latest_products:
-        print(f"ID: {product.id}")
-        print(f"Название: {product.name}")
-        print(f"Категория: {product.category.name}")
-        print(f"Цена: {product.price} руб.")
-        print(f"Создан: {product.created_at}")
-        print("-" * 40)
+        return queryset
 
-    context = {
-        'products': products,  # Теперь это объект Page с товарами
-        'latest_products_count': latest_products.count(),
-    }
-
-    return render(request, 'catalog/home.html', context)
+    def get_context_data(self, **kwargs):
+        """
+        Добавляет дополнительные данные в контекст шаблона.
+        """
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = 'Каталог товаров'
+        context['total_products'] = Product.objects.count()
+        return context
 
 
-def product_detail(request, pk):
+class ProductDetailView(DetailView):
     """
-    Контроллер для отображения детальной информации о товаре.
-
-    Принимает первичный ключ товара (pk) и возвращает страницу
-    с полной информацией о выбранном товаре.
+    Страница детального просмотра товара.
     """
-    # Получаем товар по первичному ключу или возвращаем 404
-    product = get_object_or_404(
-        Product.objects.select_related('category'),
-        pk=pk
-    )
+    model = Product
+    template_name = 'catalog/product_detail.html'
+    context_object_name = 'product'
 
-    context = {
-        'product': product,
-    }
+    def get_context_data(self, **kwargs):
+        """Добавляем дополнительную информацию о товаре."""
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = f'Товар: {self.object.name}'
 
-    return render(request, 'catalog/product_detail.html', context)
+        # Можно добавить связанные товары, отзывы и т.д.
+        context['related_products'] = Product.objects.exclude(
+            pk=self.object.pk
+        )[:4]  # 4 похожих товара
+
+        return context
 
 
-def contacts(request):
+class ContactView(TemplateView):
     """
-    Контроллер для отображения страницы контактов.
-
-    Обрабатывает как GET-запросы для отображения формы,
-    так и POST-запросы для обработки отправленных данных.
+    Страница контактов
     """
-    if request.method == 'POST':
-        # Получаем данные из формы
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        message = request.POST.get('message')
+    template_name = 'catalog/contact.html'
 
-        # Простая валидация
-        if name and email and message:
-            messages.success(
-                request,
-                f'Спасибо, {name}! Ваше сообщение успешно отправлено. '
-                'Мы свяжемся с вами в ближайшее время.'
-            )
-        else:
-            messages.error(request, 'Пожалуйста, заполните все поля формы.')
-
-    return render(request, 'catalog/contacts.html')
-
-
-def add_product(request):
-    """
-    Контроллер для добавления нового товара (дополнительное задание).
-
-    Позволяет пользователям добавлять новые товары в каталог
-    через веб-форму с валидацией данных.
-    """
-    if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES)
-        if form.is_valid():
-            # Сохраняем новый товар в базу данных
-            product = form.save()
-            messages.success(
-                request,
-                f'Товар "{product.name}" успешно добавлен в каталог!'
-            )
-            # Перенаправляем на страницу детального просмотра нового товара
-            return HttpResponseRedirect(
-                reverse('catalog:product_detail', args=[product.pk])
-            )
-        else:
-            messages.error(
-                request,
-                'Пожалуйста, исправьте ошибки в форме.'
-            )
-    else:
-        form = ProductForm()
-
-    context = {
-        'form': form,
-    }
-
-    return render(request, 'catalog/add_product.html', context)
+    def get_context_data(self, **kwargs):
+        """Добавляем контактную информацию."""
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'page_title': 'Контакты',
+            'company_name': 'Django Shop',
+            'email': 'info@djangoshop.com',
+            'phone': '+7 (123) 456-78-90',
+            'address': 'г. Москва, ул. Примерная, д. 123',
+            'working_hours': 'Пн-Пт: 9:00-18:00, Сб-Вс: выходной'
+        })
+        return context

@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <!-- Заголовок страницы -->
+        <div class="mb-4">
+            <h1 class="display-6">
+                {% if form_action == 'create' %}
+                    ➕ {{ page_title }}
+                {% else %}
+                    ✏️ {{ page_title }}
+                {% endif %}
+            </h1>
+            <p class="lead text-muted">
+                {% if form_action == 'create' %}
+                    Создайте новую интересную статью для блога
+                {% else %}
+                    Внесите изменения в существующую статью
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Форма -->
+        <div class="bg-white rounded shadow-sm p-4">
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+                
+                <!-- Поле заголовка -->
+                <div class="mb-3">
+                    <label for="{{ form.title.id_for_label }}" class="form-label fw-bold">
+                        {{ form.title.label }}
+                        <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" 
+                           class="form-control {% if form.title.errors %}is-invalid{% endif %}" 
+                           id="{{ form.title.id_for_label }}"
+                           name="{{ form.title.name }}"
+                           value="{{ form.title.value|default_if_none:'' }}"
+                           maxlength="200"
+                           required
+                           placeholder="Введите заголовок статьи">
+                    
+                    {% if form.title.errors %}
+                        <div class="invalid-feedback">
+                            {{ form.title.errors.0 }}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="form-text">
+                        Придумайте яркий и понятный заголовок (максимум 200 символов)
+                    </div>
+                </div>
+                
+                <!-- Поле содержимого -->
+                <div class="mb-3">
+                    <label for="{{ form.content.id_for_label }}" class="form-label fw-bold">
+                        {{ form.content.label }}
+                        <span class="text-danger">*</span>
+                    </label>
+                    <textarea class="form-control {% if form.content.errors %}is-invalid{% endif %}" 
+                              id="{{ form.content.id_for_label }}"
+                              name="{{ form.content.name }}"
+                              rows="15"
+                              required
+                              placeholder="Напишите содержимое статьи...">{{ form.content.value|default_if_none:'' }}</textarea>
+                    
+                    {% if form.content.errors %}
+                        <div class="invalid-feedback">
+                            {{ form.content.errors.0 }}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="form-text">
+                        Основной текст статьи. Можете использовать переносы строк для абзацев.
+                    </div>
+                </div>
+                
+                <!-- Поле превью изображения -->
+                <div class="mb-3">
+                    <label for="{{ form.preview_image.id_for_label }}" class="form-label fw-bold">
+                        {{ form.preview_image.label }}
+                    </label>
+                    
+                    {% if object and object.preview_image %}
+                        <div class="mb-2">
+                            <small class="text-muted">Текущее изображение:</small><br>
+                            <img src="{{ object.preview_image.url }}" 
+                                 alt="Текущее превью" 
+                                 class="img-thumbnail"
+                                 style="max-width: 200px;">
+                        </div>
+                    {% endif %}
+                    
+                    <input type="file" 
+                           class="form-control {% if form.preview_image.errors %}is-invalid{% endif %}" 
+                           id="{{ form.preview_image.id_for_label }}"
+                           name="{{ form.preview_image.name }}"
+                           accept="image/*">
+                    
+                    {% if form.preview_image.errors %}
+                        <div class="invalid-feedback">
+                            {{ form.preview_image.errors.0 }}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="form-text">
+                        Выберите изображение для превью статьи (необязательно)
+                    </div>
+                </div>
+                
+                <!-- Флажок публикации -->
+                <div class="mb-4">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" 
+                               type="checkbox" 
+                               id="{{ form.is_published.id_for_label }}"
+                               name="{{ form.is_published.name }}"
+                               {% if form.is_published.value %}checked{% endif %}>
+                        <label class="form-check-label fw-bold" for="{{ form.is_published.id_for_label }}">
+                            {{ form.is_published.label }}
+                        </label>
+                        <div class="form-text">
+                            Опубликованные статьи видны всем посетителям сайта
+                        </div>
+                    </div>
+                    
+                    {% if form.is_published.errors %}
+                        <div class="text-danger small">
+                            {{ form.is_published.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Кнопки -->
+                <div class="d-flex gap-3 justify-content-end">
+                    <a href="{% if object %}{{ object.get_absolute_url }}{% else %}{% url 'blog:blog_list' %}{% endif %}" 
+                       class="btn btn-outline-secondary">
+                        ❌ Отмена
+                    </a>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        {% if form_action == 'create' %}
+                            ➕ Создать статью
+                        {% else %}
+                            💾 Сохранить изменения
+                        {% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Подсказки -->
+        <div class="mt-4">
+            <div class="alert alert-info">
+                <h6>💡 Советы по написанию статей:</h6>
+                <ul class="mb-0">
+                    <li>Используйте ясный и понятный язык</li>
+                    <li>Структурируйте текст с помощью абзацев</li>
+                    <li>Добавьте привлекательное изображение</li>
+                    <li>Сначала сохраните как черновик, потом опубликуйте</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Улучшения пользовательского интерфейса
+    document.addEventListener('DOMContentLoaded', function() {
+        // Автоматическое изменение размера textarea
+        const textarea = document.querySelector('textarea[name="content"]');
+        if (textarea) {
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+        }
+        
+        // Предварительный просмотр изображения
+        const imageInput = document.querySelector('input[type="file"]');
+        if (imageInput) {
+            imageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        // Создаем или обновляем превью
+                        let preview = document.querySelector('#image-preview');
+                        if (!preview) {
+                            preview = document.createElement('div');
+                            preview.id = 'image-preview';
+                            preview.className = 'mt-2';
+                            imageInput.parentNode.appendChild(preview);
+                        }
+                        preview.innerHTML = `
+                            <small class="text-muted">Предварительный просмотр:</small><br>
+                            <img src="${e.target.result}" class="img-thumbnail" style="max-width: 200px;">
+                        `;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

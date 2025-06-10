@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6 mx-auto">
+        <div class="bg-white rounded shadow-sm p-4">
+            <!-- Предупреждающий заголовок -->
+            <div class="text-center mb-4">
+                <div class="display-1 text-danger mb-3">⚠️</div>
+                <h1 class="h3 text-danger">{{ page_title }}</h1>
+            </div>
+            
+            <!-- Информация о статье -->
+            <div class="alert alert-warning">
+                <h5 class="alert-heading">Вы уверены?</h5>
+                <p>Вы собираетесь <strong>безвозвратно удалить</strong> статью:</p>
+                <hr>
+                <div class="mb-2">
+                    <strong>Заголовок:</strong> {{ object.title }}
+                </div>
+                <div class="mb-2">
+                    <strong>Дата создания:</strong> {{ object.created_date|date:"d.m.Y в H:i" }}
+                </div>
+                <div class="mb-2">
+                    <strong>Просмотров:</strong> {{ object.views_count }}
+                </div>
+                <div>
+                    <strong>Статус:</strong> 
+                    {% if object.is_published %}
+                        <span class="badge bg-success">Опубликовано</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Черновик</span>
+                    {% endif %}
+                </div>
+                <hr>
+                <p class="mb-0 fw-bold">Это действие нельзя отменить!</p>
+            </div>
+            
+            <!-- Краткий предварительный просмотр -->
+            {% if object.preview_image %}
+                <div class="text-center mb-3">
+                    <img src="{{ object.preview_image.url }}" 
+                         alt="{{ object.title }}" 
+                         class="img-thumbnail"
+                         style="max-width: 150px;">
+                </div>
+            {% endif %}
+            
+            <div class="bg-light p-3 rounded mb-4">
+                <small class="text-muted">Содержимое:</small>
+                <p class="mb-0">{{ object.get_short_content:30 }}</p>
+            </div>
+            
+            <!-- Форма подтверждения удаления -->
+            <form method="post" class="d-flex gap-3 justify-content-center">
+                {% csrf_token %}
+                
+                <a href="{{ object.get_absolute_url }}" class="btn btn-success">
+                    ↩️ Нет, оставить статью
+                </a>
+                
+                <button type="submit" class="btn btn-danger">
+                    🗑️ Да, удалить безвозвратно
+                </button>
+            </form>
+            
+            <!-- Дополнительная информация -->
+            <div class="mt-4 text-center">
+                <small class="text-muted">
+                    Если вы не уверены, лучше вернитесь назад и сначала снимите статью с публикации
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Дополнительная защита от случайного удаления
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteForm = document.querySelector('form');
+        const deleteButton = deleteForm.querySelector('button[type="submit"]');
+        
+        deleteButton.addEventListener('click', function(e) {
+            // Двойное подтверждение для критического действия
+            const confirmation = confirm(
+                'ВНИМАНИЕ! Вы действительно хотите удалить статью "{{ object.title }}"?\n\n' +
+                'Это действие нельзя отменить!'
+            );
+            
+            if (!confirmation) {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Изменяем текст кнопки для визуальной обратной связи
+            deleteButton.innerHTML = '⏳ Удаляем...';
+            deleteButton.disabled = true;
+        });
+    });
+</script>
+{% endblock %}
