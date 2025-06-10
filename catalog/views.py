@@ -1,22 +1,44 @@
 from django.shortcuts import render
 from django.contrib import messages
+from .models import Product
 
 
 def home(request):
     """
     Контроллер для отображения главной страницы.
 
-    На данном этапе просто рендерит шаблон без данных из БД,
-    так как модели будут добавлены в ДЗ2.
+    Теперь получаем реальные товары из базы данных и выводим
+    последние 5 созданных товаров в консоль (дополнительное задание).
     """
-    return render(request, 'catalog/home.html')
+    # Получаем все товары для отображения на главной странице
+    products = Product.objects.select_related('category').all()
+
+    # Дополнительное задание: выводим последние 5 товаров в консоль
+    latest_products = Product.objects.select_related('category').order_by('-created_at')[:5]
+
+    print("=== ПОСЛЕДНИЕ 5 СОЗДАННЫХ ТОВАРОВ ===")
+    for product in latest_products:
+        print(f"ID: {product.id}")
+        print(f"Название: {product.name}")
+        print(f"Категория: {product.category.name}")
+        print(f"Цена: {product.price} руб.")
+        print(f"Создан: {product.created_at}")
+        print("-" * 40)
+
+    context = {
+        'products': products,
+        'latest_products_count': latest_products.count(),
+    }
+
+    return render(request, 'catalog/home.html', context)
 
 
 def contacts(request):
     """
     Контроллер для отображения страницы контактов.
 
-    Включает обработку формы обратной связи (дополнительное задание).
+    В дополнительном задании здесь будет модель для хранения
+    контактных данных и вывод данных из админки.
     """
     if request.method == 'POST':
         # Получаем данные из формы
@@ -26,8 +48,6 @@ def contacts(request):
 
         # Простая валидация
         if name and email and message:
-            # В реальном проекте здесь была бы отправка email или сохранение в БД
-            # Пока просто показываем сообщение об успехе
             messages.success(
                 request,
                 f'Спасибо, {name}! Ваше сообщение успешно отправлено. '
