@@ -58,33 +58,38 @@ class ProductForm(forms.ModelForm):
         """
         super().__init__(*args, **kwargs)
 
-        # Применяем стили Bootstrap ко всем полям
+        # Применяем стили Bootstrap ко всем полям с явными ID
         self.fields['name'].widget.attrs.update({
             'class': 'form-control',
             'placeholder': 'Введите название товара',
-            'maxlength': '200'
+            'maxlength': '200',
+            'id': 'product-name-field'
         })
 
         self.fields['description'].widget = forms.Textarea(attrs={
             'class': 'form-control',
             'rows': 5,
-            'placeholder': 'Опишите товар подробно...'
+            'placeholder': 'Опишите товар подробно...',
+            'id': 'product-description-field'
         })
 
         self.fields['category'].widget.attrs.update({
-            'class': 'form-select'
+            'class': 'form-select',
+            'id': 'product-category-field'
         })
 
         self.fields['price'].widget.attrs.update({
             'class': 'form-control',
             'step': '0.01',
             'min': '0',
-            'placeholder': '0.00'
+            'placeholder': '0.00',
+            'id': 'product-price-field'
         })
 
         self.fields['image'].widget.attrs.update({
             'class': 'form-control',
-            'accept': 'image/jpeg,image/jpg,image/png'
+            'accept': 'image/jpeg,image/jpg,image/png',
+            'id': 'product-image-field'
         })
 
         # Проверяем, есть ли категории в базе данных

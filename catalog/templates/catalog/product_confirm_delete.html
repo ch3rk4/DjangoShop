@@ -1,0 +1,383 @@
+<!-- Наследуем от базового шаблона -->
+{% extends 'catalog/base.html' %}
+
+<!-- Заголовок страницы -->
+{% block title %}{{ page_title }} - Каталог товаров{% endblock %}
+
+<!-- Дополнительные стили для страницы удаления -->
+{% block extra_css %}
+<style>
+    /* Стили для создания серьезной атмосферы подтверждения */
+    .delete-container {
+        background: #ffffff;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border: 2px solid #dc3545;
+    }
+
+    /* Стили для предупреждающего заголовка */
+    .warning-header {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        color: white;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    /* Стили для информации о товаре */
+    .product-info-card {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Стили для превью товара */
+    .product-preview-image {
+        max-width: 120px;
+        max-height: 120px;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Стили для кнопок */
+    .btn-danger-confirm {
+        background: #dc3545;
+        border-color: #dc3545;
+        transition: all 0.3s ease;
+    }
+
+    .btn-danger-confirm:hover {
+        background: #c82333;
+        border-color: #bd2130;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+    }
+
+    .btn-safe {
+        background: #28a745;
+        border-color: #28a745;
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+    .btn-safe:hover {
+        background: #218838;
+        border-color: #1e7e34;
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+    }
+
+    /* Анимация пульсации для критической кнопки */
+    @keyframes pulse-danger {
+        0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+    }
+
+    .pulse-danger {
+        animation: pulse-danger 2s infinite;
+    }
+</style>
+{% endblock %}
+
+<!-- Основной контент -->
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="delete-container">
+
+                <!-- Предупреждающий заголовок -->
+                <div class="warning-header">
+                    <div class="display-1 mb-3">⚠️</div>
+                    <h1 class="h2 mb-2">Внимание! Удаление товара</h1>
+                    <p class="mb-0 lead">
+                        Это действие нельзя отменить после подтверждения
+                    </p>
+                </div>
+
+                <!-- Основное предупреждение -->
+                <div class="alert alert-danger mb-4">
+                    <h5 class="alert-heading">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        Вы уверены, что хотите удалить этот товар?
+                    </h5>
+                    <p class="mb-2">
+                        Товар будет <strong>безвозвратно удален</strong> из базы данных.
+                        Восстановить его после удаления будет невозможно.
+                    </p>
+                    <hr>
+                    <p class="mb-0">
+                        <strong>Рекомендация:</strong> Если товар временно недоступен,
+                        лучше отредактировать его информацию вместо удаления.
+                    </p>
+                </div>
+
+                <!-- Информация о товаре -->
+                <div class="product-info-card">
+                    <h4 class="mb-3">
+                        <i class="bi bi-info-circle text-primary"></i>
+                        Информация об удаляемом товаре
+                    </h4>
+
+                    <div class="row">
+                        <!-- Изображение товара -->
+                        <div class="col-md-3 text-center mb-3">
+                            {% if object.image %}
+                                <img src="{{ object.image.url }}"
+                                     alt="{{ object.name }}"
+                                     class="product-preview-image">
+                            {% else %}
+                                <div class="product-preview-image d-flex align-items-center justify-content-center bg-light">
+                                    <i class="bi bi-image fs-1 text-muted"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Детали товара -->
+                        <div class="col-md-9">
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <strong>Название:</strong><br>
+                                    <span class="text-dark">{{ object.name }}</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>Цена:</strong><br>
+                                    <span class="text-success fs-5">{{ object.price }} ₽</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>Категория:</strong><br>
+                                    <span class="text-muted">{{ object.category.name }}</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>ID товара:</strong><br>
+                                    <span class="text-muted">#{{ object.id }}</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>Дата создания:</strong><br>
+                                    <span class="text-muted">{{ object.created_at|date:"d.m.Y в H:i" }}</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>Последнее изменение:</strong><br>
+                                    <span class="text-muted">{{ object.updated_at|date:"d.m.Y в H:i" }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Описание товара -->
+                    {% if object.description %}
+                        <div class="mt-3">
+                            <strong>Описание:</strong><br>
+                            <div class="bg-white p-3 rounded border">
+                                {{ object.description|truncatewords:30|linebreaks }}
+                                {% if object.description|wordcount > 30 %}
+                                    <small class="text-muted">[описание сокращено]</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Дополнительные предупреждения -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="alert alert-warning">
+                            <h6 class="alert-heading">
+                                <i class="bi bi-clock-history"></i> Что произойдет
+                            </h6>
+                            <ul class="mb-0 small">
+                                <li>Товар исчезнет из каталога</li>
+                                <li>Все данные будут удалены</li>
+                                <li>Изображение будет удалено с сервера</li>
+                                <li>Восстановление невозможно</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading">
+                                <i class="bi bi-lightbulb"></i> Альтернативы
+                            </h6>
+                            <ul class="mb-0 small">
+                                <li>Отредактировать информацию</li>
+                                <li>Изменить цену</li>
+                                <li>Обновить описание</li>
+                                <li>Сменить категорию</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Форма подтверждения удаления -->
+                <div class="text-center">
+                    <h5 class="mb-3">Подтвердите ваше решение:</h5>
+
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+
+                        <!-- Кнопка отмены (безопасная) -->
+                        <a href="{% url 'catalog:product_detail' object.pk %}"
+                           class="btn btn-safe btn-lg me-3">
+                            <i class="bi bi-shield-check"></i>
+                            Нет, оставить товар
+                        </a>
+
+                        <!-- Кнопка подтверждения удаления (опасная) -->
+                        <button type="submit"
+                                class="btn btn-danger btn-lg btn-danger-confirm pulse-danger"
+                                id="confirmDeleteBtn">
+                            <i class="bi bi-trash"></i>
+                            Да, удалить безвозвратно
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Дополнительная информация -->
+                <div class="mt-4 text-center">
+                    <small class="text-muted">
+                        💡 <strong>Совет:</strong> Если вы сомневаетесь, лучше сначала вернитесь к товару
+                        и внимательно изучите его. Удаление - это крайняя мера.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно дополнительного подтверждения -->
+    <div class="modal fade" id="finalConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        Финальное подтверждение
+                    </h5>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="mb-3">
+                        <i class="bi bi-trash display-1 text-danger"></i>
+                    </div>
+                    <h6>Вы точно хотите удалить товар:</h6>
+                    <p class="fw-bold">"{{ object.name }}"?</p>
+                    <p class="text-muted small">
+                        Введите название товара для подтверждения:
+                    </p>
+                    <input type="text"
+                           class="form-control"
+                           id="confirmationInput"
+                           placeholder="Введите: {{ object.name }}">
+                    <div id="confirmationError" class="text-danger small mt-2" style="display: none;">
+                        Название не совпадает. Попробуйте еще раз.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Отмена
+                    </button>
+                    <button type="button" class="btn btn-danger" id="finalConfirmBtn" disabled>
+                        Удалить навсегда
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+<!-- JavaScript для дополнительной защиты -->
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        const finalConfirmModal = new bootstrap.Modal(document.getElementById('finalConfirmModal'));
+        const confirmationInput = document.getElementById('confirmationInput');
+        const finalConfirmBtn = document.getElementById('finalConfirmBtn');
+        const confirmationError = document.getElementById('confirmationError');
+
+        const productName = "{{ object.name }}";
+
+        // Перехватываем отправку формы для показа модального окна
+        if (form && confirmDeleteBtn) {
+            confirmDeleteBtn.addEventListener('click', function(e) {
+                e.preventDefault(); // Останавливаем стандартную отправку формы
+                finalConfirmModal.show(); // Показываем модальное окно
+            });
+        }
+
+        // Валидация ввода в модальном окне
+        if (confirmationInput) {
+            confirmationInput.addEventListener('input', function() {
+                const inputValue = this.value.trim();
+                const isValid = inputValue === productName;
+
+                finalConfirmBtn.disabled = !isValid;
+
+                if (inputValue.length > 0 && !isValid) {
+                    confirmationError.style.display = 'block';
+                } else {
+                    confirmationError.style.display = 'none';
+                }
+
+                // Меняем стиль кнопки в зависимости от валидности
+                if (isValid) {
+                    finalConfirmBtn.classList.remove('btn-outline-danger');
+                    finalConfirmBtn.classList.add('btn-danger');
+                } else {
+                    finalConfirmBtn.classList.remove('btn-danger');
+                    finalConfirmBtn.classList.add('btn-outline-danger');
+                }
+            });
+        }
+
+        // Финальное подтверждение и отправка формы
+        if (finalConfirmBtn) {
+            finalConfirmBtn.addEventListener('click', function() {
+                // Дополнительная проверка
+                if (confirmationInput.value.trim() === productName) {
+                    // Показываем индикатор загрузки
+                    this.innerHTML = '<i class="bi bi-hourglass-split"></i> Удаляем...';
+                    this.disabled = true;
+
+                    // Закрываем модальное окно
+                    finalConfirmModal.hide();
+
+                    // Отправляем форму
+                    form.submit();
+                } else {
+                    alert('Название товара не совпадает!');
+                }
+            });
+        }
+
+        // Фокус на поле ввода при открытии модального окна
+        document.getElementById('finalConfirmModal').addEventListener('shown.bs.modal', function() {
+            confirmationInput.focus();
+            confirmationInput.value = '';
+            finalConfirmBtn.disabled = true;
+            confirmationError.style.display = 'none';
+        });
+
+        // Дополнительное предупреждение при попытке покинуть страницу
+        let isFormSubmitted = false;
+
+        if (form) {
+            form.addEventListener('submit', function() {
+                isFormSubmitted = true;
+            });
+        }
+
+        window.addEventListener('beforeunload', function(e) {
+            if (!isFormSubmitted) {
+                // Современные браузеры показывают стандартное сообщение
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+    });
+</script>
+{% endblock %>
