@@ -1,24 +1,26 @@
 """
-Django settings for djangoshop project.
-
+Django settings for config project.
+Исправленная версия с правильными настройками для запуска сервера.
 """
 
+import os
 from pathlib import Path
 
+# Базовая директория проекта
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# БЕЗОПАСНОСТЬ: Секретный ключ для продакшена должен храниться в переменных окружения
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-your-secret-key-here-change-in-production')
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-your-secret-key-here'
+# БЕЗОПАСНОСТЬ: Не используйте DEBUG=True в продакшене!
+DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Разрешенные хосты для подключения
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
-ALLOWED_HOSTS = []
-
-
-
+# Приложения Django
 INSTALLED_APPS = [
+    # Встроенные приложения Django
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -26,11 +28,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-
-    'catalog',
-    'blog',
+    # Наши кастомные приложения
+    'catalog',  # Каталог товаров
+    'blog',     # Блог
 ]
 
+# Промежуточное ПО (middleware) - обрабатывает запросы и ответы
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -41,13 +44,15 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# ИСПРАВЛЕНО: Правильный путь к корневому URL-конфигу
 ROOT_URLCONF = 'config.urls'
 
+# Настройки шаблонов
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
+        'DIRS': [BASE_DIR / 'templates'],  # Папка с общими шаблонами
+        'APP_DIRS': True,  # Автоматический поиск шаблонов в приложениях
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -59,17 +64,37 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'djangoshop.wsgi.application'
+
+WSGI_APPLICATION = 'config.wsgi.application'
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+DATABASE_ENGINE = os.getenv('DB_ENGINE', 'django.db.backends.sqlite3')
+
+if DATABASE_ENGINE == 'django.db.backends.postgresql':
+    # Настройки для PostgreSQL (для продакшена)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME', 'djangoshop_db'),
+            'USER': os.getenv('DB_USER', 'postgres'),
+            'PASSWORD': os.getenv('DB_PASSWORD', ''),
+            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'PORT': os.getenv('DB_PORT', '5432'),
+            'OPTIONS': {
+                'charset': 'utf8',
+            },
+        }
     }
-}
+else:
+    # Настройки для SQLite (для разработки)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
-
+# Валидаторы паролей для безопасности
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -85,34 +110,33 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-
+# Настройки локализации
 LANGUAGE_CODE = 'ru-ru'
-
 TIME_ZONE = 'Europe/Moscow'
-
 USE_I18N = True
-
 USE_TZ = True
 
-
-
+# Настройки статических файлов (CSS, JavaScript, изображения)
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
+    BASE_DIR / 'static',  # Папка для статических файлов разработки
 ]
+# В продакшене добавьте STATIC_ROOT для collectstatic
 
+# Настройки медиафайлов (загружаемые пользователями файлы)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-
+# Поле по умолчанию для автоинкрементных ключей
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'noreply@djangoshop.com'
-ADMIN_EMAIL = 'admin@djangoshop.com'
+# Настройки отправки email
+# Для разработки используем консольный бэкенд (письма выводятся в терминал)
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@djangoshop.com')
+ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'admin@djangoshop.com')
 
-# Для продакшена раскомментируйте и настройте:
+# Для продакшена настройте SMTP:
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # EMAIL_HOST = 'smtp.gmail.com'
 # EMAIL_PORT = 587
