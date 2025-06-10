@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="refresh urls">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/catalog/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/catalog/forms.py" afterDir="false" />
-    </list>
+    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment=" refresh base" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -377,7 +374,23 @@
       <option name="project" value="LOCAL" />
       <updated>1749566843803</updated>
     </task>
-    <option name="localTasksCounter" value="39" />
+    <task id="LOCAL-00039" summary="fix forms and create product_form, product_confirm; refresh base">
+      <option name="closed" value="true" />
+      <created>1749568343900</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1749568343901</updated>
+    </task>
+    <task id="LOCAL-00040" summary=" refresh base">
+      <option name="closed" value="true" />
+      <created>1749568354547</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1749568354547</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -404,8 +417,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="create views" />
-    <MESSAGE value="create fixtures" />
     <MESSAGE value="create custom commands" />
     <MESSAGE value="refresh home.html" />
     <MESSAGE value="final" />
@@ -429,6 +440,8 @@
     <MESSAGE value="refresh forms" />
     <MESSAGE value="refresh views" />
     <MESSAGE value="refresh urls" />
-    <option name="LAST_COMMIT_MESSAGE" value="refresh urls" />
+    <MESSAGE value="fix forms and create product_form, product_confirm; refresh base" />
+    <MESSAGE value=" refresh base" />
+    <option name="LAST_COMMIT_MESSAGE" value=" refresh base" />
   </component>
 </project>

@@ -1,5 +1,4 @@
 <!-- Наследуем от базового шаблона -->
-<!-- extends говорит Django использовать base.html как основу -->
 {% extends 'catalog/base.html' %}
 
 <!-- Переопределяем заголовок страницы -->
@@ -8,36 +7,60 @@
 <!-- Основной контент страницы -->
 {% block content %}
     <!-- Hero секция - привлекающий внимание баннер -->
-    <!-- jumbotron - это большой заметный блок для важной информации -->
     <div class="jumbotron bg-primary text-white rounded p-5 mb-4">
         <div class="container-fluid py-5">
             <h1 class="display-5 fw-bold">Добро пожаловать в наш каталог!</h1>
             <p class="fs-4">Здесь вы найдете лучшие товары по выгодным ценам.</p>
-            
+
             <!-- Показываем информацию о количестве товаров если они есть -->
             {% if latest_products_count > 0 %}
                 <p class="mb-0">
-                    <small>В консоли выведена информация о {{ latest_products_count }} последних товарах</small>
+                    <small>В каталоге представлено {{ total_products }} товаров</small>
                 </p>
             {% endif %}
-            
+
             <!-- Призыв к действию -->
-            <a class="btn btn-light btn-lg mt-3" href="{% url 'catalog:contacts' %}" role="button">
-                <i class="bi bi-envelope"></i> Связаться с нами
-            </a>
+            <div class="mt-3">
+                <a class="btn btn-light btn-lg me-2" href="{% url 'catalog:product_create' %}" role="button">
+                    <i class="bi bi-plus-circle"></i> Добавить товар
+                </a>
+                <a class="btn btn-outline-light btn-lg" href="{% url 'catalog:contacts' %}" role="button">
+                    <i class="bi bi-envelope"></i> Связаться с нами
+                </a>
+            </div>
         </div>
     </div>
+
+    <!-- Поиск и фильтры -->
+    {% if search_query %}
+        <div class="alert alert-info">
+            <i class="bi bi-search"></i>
+            Результаты поиска по запросу: <strong>"{{ search_query }}"</strong>
+            (найдено {{ search_results_count }} товаров)
+            <a href="{% url 'catalog:home' %}" class="btn btn-sm btn-outline-info ms-2">
+                <i class="bi bi-x"></i> Очистить поиск
+            </a>
+        </div>
+    {% endif %}
 
     <!-- Секция товаров -->
     <div class="row">
         <div class="col-12">
             <!-- Заголовок с информацией о пагинации -->
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2>Наши товары</h2>
+                <h2>
+                    <i class="bi bi-grid"></i>
+                    {% if search_query %}
+                        Результаты поиска
+                    {% else %}
+                        Наши товары
+                    {% endif %}
+                </h2>
+
                 <!-- Показываем информацию о текущей странице -->
                 {% if products.has_other_pages %}
                     <small class="text-muted">
-                        Показано {{ products.start_index }}–{{ products.end_index }} 
+                        Показано {{ products.start_index }}–{{ products.end_index }}
                         из {{ products.paginator.count }} товаров
                     </small>
                 {% endif %}
@@ -46,44 +69,38 @@
             <!-- Проверяем, есть ли товары для отображения -->
             {% if products %}
                 <!-- Сетка товаров -->
-                <!-- row создает горизонтальную группу колонок -->
                 <div class="row">
                     <!-- Цикл по всем товарам на текущей странице -->
                     {% for product in products %}
-                        <!-- Каждый товар занимает 1/3 ширины на средних экранах -->
-                        <!-- col-md-4 означает 4 колонки из 12 (12/4 = 3 товара в ряд) -->
-                        <div class="col-md-4 mb-4">
+                        <div class="col-lg-4 col-md-6 mb-4">
                             <!-- Карточка товара с эффектом hover -->
                             <div class="card product-card h-100">
                                 <!-- Изображение товара -->
                                 {% if product.image %}
-                                    <!-- Если у товара есть изображение, показываем его -->
-                                    <img src="{{ product.image.url }}" 
-                                         class="card-img-top product-image" 
+                                    <img src="{{ product.image.url }}"
+                                         class="card-img-top product-image"
                                          alt="{{ product.name }}">
                                 {% else %}
-                                    <!-- Заглушка для товаров без изображения -->
-                                    <img src="https://via.placeholder.com/300x200/e9ecef/6c757d?text=Нет+изображения" 
-                                         class="card-img-top product-image" 
-                                         alt="Изображение товара отсутствует">
+                                    <div class="card-img-top product-image bg-light d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-image fs-1 text-muted"></i>
+                                    </div>
                                 {% endif %}
 
                                 <!-- Содержимое карточки -->
                                 <div class="card-body d-flex flex-column">
                                     <!-- Название товара -->
                                     <h5 class="card-title">{{ product.name }}</h5>
-                                    
-                                    <!-- Сокращенное описание (до 100 символов) -->
+
+                                    <!-- Сокращенное описание -->
                                     <p class="card-text">{{ product.get_short_description }}</p>
-                                    
+
                                     <!-- Категория товара -->
                                     <p class="text-muted small mb-2">
-                                        <i class="bi bi-tag"></i> 
-                                        Категория: {{ product.category.name }}
+                                        <i class="bi bi-tag"></i>
+                                        {{ product.category.name }}
                                     </p>
 
                                     <!-- Нижняя часть карточки (цена и кнопки) -->
-                                    <!-- mt-auto прижимает этот блок к низу карточки -->
                                     <div class="mt-auto">
                                         <!-- Цена товара -->
                                         <p class="card-text">
@@ -91,13 +108,18 @@
                                                 {{ product.price }} ₽
                                             </strong>
                                         </p>
-                                        
-                                        <!-- Кнопка перехода к детальной странице -->
-                                        <!-- ВАЖНО: теперь ведет на реальную страницу товара -->
-                                        <a href="{% url 'catalog:product_detail' product.pk %}" 
-                                           class="btn btn-primary">
-                                            <i class="bi bi-eye"></i> Подробнее
-                                        </a>
+
+                                        <!-- Кнопки действий -->
+                                        <div class="d-flex gap-2">
+                                            <a href="{% url 'catalog:product_detail' product.pk %}"
+                                               class="btn btn-primary flex-grow-1">
+                                                <i class="bi bi-eye"></i> Подробнее
+                                            </a>
+                                            <a href="{% url 'catalog:product_update' product.pk %}"
+                                               class="btn btn-outline-secondary">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -106,20 +128,19 @@
                 </div>
 
                 <!-- Пагинация - навигация по страницам -->
-                <!-- Показываем только если есть больше одной страницы -->
                 {% if products.has_other_pages %}
                     <nav aria-label="Навигация по страницам товаров" class="mt-4">
                         <ul class="pagination justify-content-center">
-                            <!-- Кнопка "Предыдущая страница" -->
+                            <!-- Кнопка "Первая страница" -->
                             {% if products.has_previous %}
                                 <li class="page-item">
-                                    <a class="page-link" href="?page=1" aria-label="Первая страница">
+                                    <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Первая страница">
                                         <i class="bi bi-chevron-double-left"></i>
                                     </a>
                                 </li>
                                 <li class="page-item">
-                                    <a class="page-link" 
-                                       href="?page={{ products.previous_page_number }}" 
+                                    <a class="page-link"
+                                       href="?page={{ products.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}"
                                        aria-label="Предыдущая страница">
                                         <i class="bi bi-chevron-left"></i>
                                     </a>
@@ -134,17 +155,14 @@
                             {% endif %}
 
                             <!-- Номера страниц -->
-                            <!-- Показываем текущую страницу и несколько соседних -->
                             {% for page_num in products.paginator.page_range %}
                                 {% if page_num == products.number %}
-                                    <!-- Текущая страница (выделена) -->
                                     <li class="page-item active" aria-current="page">
                                         <span class="page-link">{{ page_num }}</span>
                                     </li>
                                 {% else %}
-                                    <!-- Ссылки на другие страницы -->
                                     <li class="page-item">
-                                        <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                                        <a class="page-link" href="?page={{ page_num }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ page_num }}</a>
                                     </li>
                                 {% endif %}
                             {% endfor %}
@@ -152,15 +170,15 @@
                             <!-- Кнопка "Следующая страница" -->
                             {% if products.has_next %}
                                 <li class="page-item">
-                                    <a class="page-link" 
-                                       href="?page={{ products.next_page_number }}" 
+                                    <a class="page-link"
+                                       href="?page={{ products.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}"
                                        aria-label="Следующая страница">
                                         <i class="bi bi-chevron-right"></i>
                                     </a>
                                 </li>
                                 <li class="page-item">
-                                    <a class="page-link" 
-                                       href="?page={{ products.paginator.num_pages }}" 
+                                    <a class="page-link"
+                                       href="?page={{ products.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}"
                                        aria-label="Последняя страница">
                                         <i class="bi bi-chevron-double-right"></i>
                                     </a>
@@ -179,19 +197,37 @@
 
             {% else %}
                 <!-- Сообщение если товаров нет -->
-                <div class="alert alert-info text-center" role="alert">
-                    <h4 class="alert-heading">
-                        <i class="bi bi-info-circle"></i> Каталог пуст
-                    </h4>
-                    <p>В настоящее время товары отсутствуют. Загрузите тестовые данные командой:</p>
-                    <code>python manage.py load_test_data</code>
-                    <hr>
-                    <p class="mb-0">
-                        Или <a href="{% url 'catalog:add_product' %}" class="alert-link">добавьте товар вручную</a>
-                    </p>
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="bi bi-inbox display-1 text-muted"></i>
+                    </div>
+
+                    {% if search_query %}
+                        <h3>Ничего не найдено</h3>
+                        <p class="lead">По запросу "{{ search_query }}" товары не найдены</p>
+                        <div class="mt-3">
+                            <a href="{% url 'catalog:home' %}" class="btn btn-primary">
+                                <i class="bi bi-arrow-left"></i> Вернуться к каталогу
+                            </a>
+                            <a href="{% url 'catalog:product_create' %}" class="btn btn-success">
+                                <i class="bi bi-plus"></i> Добавить товар
+                            </a>
+                        </div>
+                    {% else %}
+                        <h3>Каталог пуст</h3>
+                        <p class="lead">В настоящее время товары отсутствуют</p>
+                        <div class="mt-3">
+                            <a href="{% url 'catalog:product_create' %}" class="btn btn-primary btn-lg">
+                                <i class="bi bi-plus-circle"></i> Добавить первый товар
+                            </a>
+                        </div>
+                        <div class="mt-4">
+                            <p class="text-muted">Или загрузите тестовые данные командой:</p>
+                            <code>python manage.py load_test_data</code>
+                        </div>
+                    {% endif %}
                 </div>
             {% endif %}
         </div>
     </div>
 {% endblock %}
-
