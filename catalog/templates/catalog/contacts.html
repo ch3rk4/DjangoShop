@@ -1,82 +1,427 @@
+<!-- Наследуем от обновленного базового шаблона -->
 {% extends 'catalog/base.html' %}
 
+<!-- Заголовок страницы -->
 {% block title %}Контакты - Каталог товаров{% endblock %}
 
+<!-- Дополнительные стили для страницы контактов -->
+{% block extra_css %}
+<style>
+    /* Стили для улучшения внешнего вида контактной информации */
+    .contact-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    
+    .contact-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 0.5rem;
+        backdrop-filter: blur(10px);
+    }
+    
+    .contact-icon {
+        font-size: 1.5rem;
+        margin-right: 1rem;
+        width: 40px;
+        text-align: center;
+    }
+    
+    /* Стили для формы обратной связи */
+    .feedback-form {
+        background: #f8f9fa;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Анимация для карты */
+    .map-container {
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .map-container:hover {
+        transform: scale(1.02);
+    }
+    
+    /* Стили для кнопки отправки */
+    .btn-send {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-send:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+    }
+</style>
+{% endblock %}
+
+<!-- Основной контент страницы -->
 {% block content %}
-    <div class="row">
+    <!-- Заголовок страницы -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 mb-3">
+                <i class="bi bi-envelope-heart text-primary"></i> 
+                Свяжитесь с нами
+            </h1>
+            <p class="lead text-muted">
+                Мы всегда рады ответить на ваши вопросы и помочь с выбором товаров
+            </p>
+        </div>
+    </div>
+
+    <div class="row g-4">
         <!-- Контактная информация -->
-        <div class="col-md-6">
-            <h2>Контактная информация</h2>
-            
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Наши контакты</h5>
-                    
-                    <p class="card-text">
-                        <strong>Адрес:</strong><br>
-                        г. Москва, ул. Примерная, д. 123, офис 456
-                    </p>
-                    
-                    <p class="card-text">
+        <div class="col-lg-6">
+            <div class="contact-card h-100">
+                <h2 class="mb-4">
+                    <i class="bi bi-info-circle"></i> 
+                    Наша контактная информация
+                </h2>
+                
+                <!-- Адрес -->
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="bi bi-geo-alt"></i>
+                    </div>
+                    <div>
+                        <strong>Наш адрес:</strong><br>
+                        г. Москва, ул. Примерная, д. 123, офис 456<br>
+                        <small>Метро: Примерная (5 минут пешком)</small>
+                    </div>
+                </div>
+                
+                <!-- Телефон -->
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="bi bi-telephone"></i>
+                    </div>
+                    <div>
                         <strong>Телефон:</strong><br>
-                        +7 (495) 123-45-67
-                    </p>
-                    
-                    <p class="card-text">
-                        <strong>Email:</strong><br>
-                        info@catalog.example.com
-                    </p>
-                    
-                    <p class="card-text">
+                        <a href="tel:+74951234567" class="text-white">+7 (495) 123-45-67</a><br>
+                        <small>Звонки принимаем с 9:00 до 18:00</small>
+                    </div>
+                </div>
+                
+                <!-- Email -->
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="bi bi-envelope"></i>
+                    </div>
+                    <div>
+                        <strong>Электронная почта:</strong><br>
+                        <a href="mailto:info@catalog.example.com" class="text-white">info@catalog.example.com</a><br>
+                        <small>Отвечаем в течение 24 часов</small>
+                    </div>
+                </div>
+                
+                <!-- Время работы -->
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="bi bi-clock"></i>
+                    </div>
+                    <div>
                         <strong>Время работы:</strong><br>
-                        Пн-Пт: 9:00 - 18:00<br>
-                        Сб-Вс: 10:00 - 16:00
-                    </p>
+                        Понедельник — Пятница: 9:00 — 18:00<br>
+                        Суббота — Воскресенье: 10:00 — 16:00<br>
+                        <small>Обед: 13:00 — 14:00</small>
+                    </div>
+                </div>
+                
+                <!-- Социальные сети (заглушка) -->
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="bi bi-share"></i>
+                    </div>
+                    <div>
+                        <strong>Мы в социальных сетях:</strong><br>
+                        <div class="mt-2">
+                            <a href="#" class="text-white me-3" title="ВКонтакте">
+                                <i class="bi bi-facebook fs-4"></i>
+                            </a>
+                            <a href="#" class="text-white me-3" title="Telegram">
+                                <i class="bi bi-telegram fs-4"></i>
+                            </a>
+                            <a href="#" class="text-white" title="Instagram">
+                                <i class="bi bi-instagram fs-4"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         
         <!-- Форма обратной связи -->
-        <div class="col-md-6">
-            <h2>Обратная связь</h2>
-            
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Напишите нам</h5>
-                    
-                    <form method="post">
-                        {% csrf_token %}
-                        
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Ваше имя *</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email *</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="message" class="form-label">Сообщение *</label>
-                            <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary">Отправить сообщение</button>
-                    </form>
+        <div class="col-lg-6">
+            <div class="feedback-form h-100">
+                <h2 class="mb-4">
+                    <i class="bi bi-chat-dots text-primary"></i> 
+                    Напишите нам сообщение
+                </h2>
+                
+                <!-- Информационное сообщение -->
+                <div class="alert alert-info mb-4">
+                    <i class="bi bi-lightbulb"></i>
+                    <strong>Совет:</strong> Чем подробнее вы опишете свой вопрос, 
+                    тем быстрее и точнее мы сможем вам помочь.
                 </div>
+                
+                <!-- Сама форма обратной связи -->
+                <form method="post" novalidate>
+                    <!-- Токен защиты Django -->
+                    {% csrf_token %}
+                    
+                    <!-- Поле имени -->
+                    <div class="mb-3">
+                        <label for="name" class="form-label">
+                            <i class="bi bi-person"></i> Ваше имя *
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="name" 
+                               name="name" 
+                               required
+                               placeholder="Введите ваше имя"
+                               value="{{ request.POST.name|default:'' }}">
+                        <div class="form-text">
+                            Как к вам обращаться в ответном сообщении
+                        </div>
+                    </div>
+                    
+                    <!-- Поле email -->
+                    <div class="mb-3">
+                        <label for="email" class="form-label">
+                            <i class="bi bi-envelope"></i> Электронная почта *
+                        </label>
+                        <input type="email" 
+                               class="form-control" 
+                               id="email" 
+                               name="email" 
+                               required
+                               placeholder="your@email.com"
+                               value="{{ request.POST.email|default:'' }}">
+                        <div class="form-text">
+                            На этот адрес мы отправим ответ
+                        </div>
+                    </div>
+                    
+                    <!-- Поле темы сообщения -->
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">
+                            <i class="bi bi-tag"></i> Тема сообщения
+                        </label>
+                        <select class="form-control" id="subject" name="subject">
+                            <option value="">Выберите тему</option>
+                            <option value="question" {% if request.POST.subject == 'question' %}selected{% endif %}>
+                                Вопрос о товаре
+                            </option>
+                            <option value="order" {% if request.POST.subject == 'order' %}selected{% endif %}>
+                                Помощь с заказом
+                            </option>
+                            <option value="suggestion" {% if request.POST.subject == 'suggestion' %}selected{% endif %}>
+                                Предложение
+                            </option>
+                            <option value="complaint" {% if request.POST.subject == 'complaint' %}selected{% endif %}>
+                                Жалоба
+                            </option>
+                            <option value="other" {% if request.POST.subject == 'other' %}selected{% endif %}>
+                                Другое
+                            </option>
+                        </select>
+                        <div class="form-text">
+                            Это поможет нам быстрее обработать ваше обращение
+                        </div>
+                    </div>
+                    
+                    <!-- Поле сообщения -->
+                    <div class="mb-4">
+                        <label for="message" class="form-label">
+                            <i class="bi bi-chat-text"></i> Ваше сообщение *
+                        </label>
+                        <textarea class="form-control" 
+                                  id="message" 
+                                  name="message" 
+                                  rows="5" 
+                                  required
+                                  placeholder="Расскажите подробно о вашем вопросе или предложении...">{{ request.POST.message|default:'' }}</textarea>
+                        <div class="form-text">
+                            Минимум 10 символов для отправки сообщения
+                        </div>
+                    </div>
+                    
+                    <!-- Согласие на обработку данных -->
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" 
+                                   type="checkbox" 
+                                   id="privacy" 
+                                   name="privacy" 
+                                   required>
+                            <label class="form-check-label" for="privacy">
+                                Я согласен на обработку персональных данных *
+                            </label>
+                        </div>
+                        <div class="form-text">
+                            Мы используем ваши данные только для ответа на обращение
+                        </div>
+                    </div>
+                    
+                    <!-- Кнопки управления -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="reset" class="btn btn-outline-secondary me-md-2">
+                            <i class="bi bi-arrow-clockwise"></i> Очистить форму
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-send">
+                            <i class="bi bi-send"></i> Отправить сообщение
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
     
-    <!-- Карта (заглушка) -->
+    <!-- Карта местоположения -->
     <div class="row mt-5">
         <div class="col-12">
-            <h3>Как нас найти</h3>
-            <div class="ratio ratio-16x9">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2244.4!2d37.6173!3d55.7558!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNTXCsDQ1JzIwLjkiTiAzN8KwMzcnMDIuMyJF!5e0!3m2!1sru!2sru!4v1234567890" 
-                        style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            <h3 class="mb-4 text-center">
+                <i class="bi bi-map text-primary"></i> 
+                Как нас найти
+            </h3>
+            
+            <div class="map-container">
+                <div class="ratio ratio-16x9">
+                    <!-- Встраиваем карту Google Maps -->
+                    <!-- В реальном проекте здесь будут настоящие координаты -->
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2244.4!2d37.6173!3d55.7558!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNTXCsDQ1JzIwLjkiTiAzN8KwMzcnMDIuMyJF!5e0!3m2!1sru!2sru!4v1234567890" 
+                            style="border:0;" 
+                            allowfullscreen="" 
+                            loading="lazy"
+                            title="Местоположение нашего офиса на карте">
+                    </iframe>
+                </div>
+            </div>
+            
+            <!-- Дополнительная информация о местоположении -->
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <div class="alert alert-info">
+                        <h6><i class="bi bi-car-front"></i> Как добраться на машине:</h6>
+                        <p class="mb-0 small">
+                            Парковка доступна во дворе дома. Въезд с ул. Примерной. 
+                            Первые 2 часа парковки бесплатно для наших клиентов.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="alert alert-success">
+                        <h6><i class="bi bi-train-front"></i> Общественный транспорт:</h6>
+                        <p class="mb-0 small">
+                            Метро "Примерная", выход №3. Автобусы 123, 456 до остановки 
+                            "Примерная улица". Время в пути от метро: 5 минут пешком.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Дополнительная информация -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card border-warning">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-warning">
+                        <i class="bi bi-question-circle"></i> 
+                        Часто задаваемые вопросы
+                    </h5>
+                    <p class="card-text">
+                        Не нашли ответ на свой вопрос? Посетите нашу страницу FAQ 
+                        или воспользуйтесь формой обратной связи выше.
+                    </p>
+                    <a href="#" class="btn btn-outline-warning">
+                        <i class="bi bi-book"></i> Перейти к FAQ
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+<!-- JavaScript для улучшения формы -->
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Находим форму и её элементы
+        const form = document.querySelector('form');
+        const messageField = document.getElementById('message');
+        const submitButton = form.querySelector('button[type="submit"]');
+        
+        // Добавляем валидацию длины сообщения
+        messageField.addEventListener('input', function() {
+            const messageLength = this.value.length;
+            const minLength = 10;
+            
+            if (messageLength < minLength) {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+                submitButton.disabled = true;
+            } else {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+                submitButton.disabled = false;
+            }
+        });
+        
+        // Добавляем анимацию при отправке формы
+        form.addEventListener('submit', function(event) {
+            // Проверяем все обязательные поля
+            const requiredFields = form.querySelectorAll('[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(function(field) {
+                if (!field.value.trim()) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    field.classList.remove('is-invalid');
+                    field.classList.add('is-valid');
+                }
+            });
+            
+            if (isValid) {
+                // Добавляем анимацию загрузки на кнопку
+                submitButton.innerHTML = '<i class="bi bi-hourglass-split"></i> Отправляем...';
+                submitButton.disabled = true;
+            } else {
+                event.preventDefault();
+                alert('Пожалуйста, заполните все обязательные поля корректно');
+            }
+        });
+        
+        // Функция для очистки формы
+        const resetButton = form.querySelector('button[type="reset"]');
+        resetButton.addEventListener('click', function() {
+            // Удаляем все классы валидации
+            const fields = form.querySelectorAll('.is-valid, .is-invalid');
+            fields.forEach(function(field) {
+                field.classList.remove('is-valid', 'is-invalid');
+            });
+            
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="bi bi-send"></i> Отправить сообщение';
+        });
+    });
+</script>
 {% endblock %}

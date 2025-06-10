@@ -1,19 +1,28 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
-from .models import Product
+from django.core.paginator import Paginator
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from .models import Product, Category
+from .forms import ProductForm
 
 
 def home(request):
     """
-    Контроллер для отображения главной страницы.
+    Контроллер для отображения главной страницы с пагинацией.
 
-    Теперь получаем реальные товары из базы данных и выводим
-    последние 5 созданных товаров в консоль (дополнительное задание).
+    Теперь включает постраничное отображение товаров для лучшей навигации
+    по большому каталогу товаров.
     """
-    # Получаем все товары для отображения на главной странице
-    products = Product.objects.select_related('category').all()
+    # Получаем все товары с оптимизированным запросом
+    products_list = Product.objects.select_related('category').all()
 
-    # Дополнительное задание: выводим последние 5 товаров в консоль
+    # Настройка пагинации - по 6 товаров на страницу
+    paginator = Paginator(products_list, 6)
+    page_number = request.GET.get('page')
+    products = paginator.get_page(page_number)
+
+    # Дополнительное задание из ДЗ2: выводим последние 5 товаров в консоль
     latest_products = Product.objects.select_related('category').order_by('-created_at')[:5]
 
     print("=== ПОСЛЕДНИЕ 5 СОЗДАННЫХ ТОВАРОВ ===")
@@ -26,19 +35,39 @@ def home(request):
         print("-" * 40)
 
     context = {
-        'products': products,
+        'products': products,  # Теперь это объект Page с товарами
         'latest_products_count': latest_products.count(),
     }
 
     return render(request, 'catalog/home.html', context)
 
 
+def product_detail(request, pk):
+    """
+    Контроллер для отображения детальной информации о товаре.
+
+    Принимает первичный ключ товара (pk) и возвращает страницу
+    с полной информацией о выбранном товаре.
+    """
+    # Получаем товар по первичному ключу или возвращаем 404
+    product = get_object_or_404(
+        Product.objects.select_related('category'),
+        pk=pk
+    )
+
+    context = {
+        'product': product,
+    }
+
+    return render(request, 'catalog/product_detail.html', context)
+
+
 def contacts(request):
     """
     Контроллер для отображения страницы контактов.
 
-    В дополнительном задании здесь будет модель для хранения
-    контактных данных и вывод данных из админки.
+    Обрабатывает как GET-запросы для отображения формы,
+    так и POST-запросы для обработки отправленных данных.
     """
     if request.method == 'POST':
         # Получаем данные из формы
@@ -57,3 +86,38 @@ def contacts(request):
             messages.error(request, 'Пожалуйста, заполните все поля формы.')
 
     return render(request, 'catalog/contacts.html')
+
+
+def add_product(request):
+    """
+    Контроллер для добавления нового товара (дополнительное задание).
+
+    Позволяет пользователям добавлять новые товары в каталог
+    через веб-форму с валидацией данных.
+    """
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Сохраняем новый товар в базу данных
+            product = form.save()
+            messages.success(
+                request,
+                f'Товар "{product.name}" успешно добавлен в каталог!'
+            )
+            # Перенаправляем на страницу детального просмотра нового товара
+            return HttpResponseRedirect(
+                reverse('catalog:product_detail', args=[product.pk])
+            )
+        else:
+            messages.error(
+                request,
+                'Пожалуйста, исправьте ошибки в форме.'
+            )
+    else:
+        form = ProductForm()
+
+    context = {
+        'form': form,
+    }
+
+    return render(request, 'catalog/add_product.html', context)

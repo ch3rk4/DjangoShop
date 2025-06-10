@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="gitignore" />
+    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="refresh contacts">
+      <change beforePath="$PROJECT_DIR$/poetry.lock" beforeDir="false" afterPath="$PROJECT_DIR$/poetry.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,34 +16,34 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="HTML File" />
         <option value="Python Script" />
+        <option value="HTML File" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="HW1" />
+        <entry key="$PROJECT_DIR$" value="HW2" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "ch3rk4"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;ch3rk4&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/ch3rk4/DjangoShop.git",
-    "accountId": "6f96d88e-1535-4788-810a-49b80da077ca"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/ch3rk4/DjangoShop.git&quot;,
+    &quot;accountId&quot;: &quot;6f96d88e-1535-4788-810a-49b80da077ca&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 7
-}]]></component>
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="2xzZ0611pzBQI1Ejx4njTJtw832" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -51,7 +54,7 @@
   "keyToString": {
     "DefaultHtmlFileTemplate": "HTML File",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "HW2"
+    "git-widget-placeholder": "HW3"
   }
 }]]></component>
   <component name="SharedIndexes">
@@ -182,7 +185,87 @@
       <option name="project" value="LOCAL" />
       <updated>1748952425617</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="gitignore2">
+      <option name="closed" value="true" />
+      <created>1748952944015</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1748952944015</updated>
+    </task>
+    <task id="LOCAL-00016" summary="refresh views">
+      <option name="closed" value="true" />
+      <created>1749032324822</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1749032324822</updated>
+    </task>
+    <task id="LOCAL-00017" summary="create forms">
+      <option name="closed" value="true" />
+      <created>1749032376767</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1749032376767</updated>
+    </task>
+    <task id="LOCAL-00018" summary="refresh urls">
+      <option name="closed" value="true" />
+      <created>1749032524609</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1749032524609</updated>
+    </task>
+    <task id="LOCAL-00019" summary="create mask for menu">
+      <option name="closed" value="true" />
+      <created>1749032653886</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1749032653886</updated>
+    </task>
+    <task id="LOCAL-00020" summary="refresh base">
+      <option name="closed" value="true" />
+      <created>1749032708126</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1749032708126</updated>
+    </task>
+    <task id="LOCAL-00021" summary="refresh home">
+      <option name="closed" value="true" />
+      <created>1749032761914</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1749032761914</updated>
+    </task>
+    <task id="LOCAL-00022" summary="create product_detail">
+      <option name="closed" value="true" />
+      <created>1749032851700</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1749032851700</updated>
+    </task>
+    <task id="LOCAL-00023" summary="create add_product">
+      <option name="closed" value="true" />
+      <created>1749032932086</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1749032932086</updated>
+    </task>
+    <task id="LOCAL-00024" summary="refresh contacts">
+      <option name="closed" value="true" />
+      <created>1749032978800</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1749032978800</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -199,6 +282,16 @@
     <MESSAGE value="refresh home.html" />
     <MESSAGE value="final" />
     <MESSAGE value="gitignore" />
-    <option name="LAST_COMMIT_MESSAGE" value="gitignore" />
+    <MESSAGE value="gitignore2" />
+    <MESSAGE value="refresh views" />
+    <MESSAGE value="create forms" />
+    <MESSAGE value="refresh urls" />
+    <MESSAGE value="create mask for menu" />
+    <MESSAGE value="refresh base" />
+    <MESSAGE value="refresh home" />
+    <MESSAGE value="create product_detail" />
+    <MESSAGE value="create add_product" />
+    <MESSAGE value="refresh contacts" />
+    <option name="LAST_COMMIT_MESSAGE" value="refresh contacts" />
   </component>
 </project>
