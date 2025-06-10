@@ -1,0 +1,82 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Контакты - Каталог товаров{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <!-- Контактная информация -->
+        <div class="col-md-6">
+            <h2>Контактная информация</h2>
+            
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Наши контакты</h5>
+                    
+                    <p class="card-text">
+                        <strong>Адрес:</strong><br>
+                        г. Москва, ул. Примерная, д. 123, офис 456
+                    </p>
+                    
+                    <p class="card-text">
+                        <strong>Телефон:</strong><br>
+                        +7 (495) 123-45-67
+                    </p>
+                    
+                    <p class="card-text">
+                        <strong>Email:</strong><br>
+                        info@catalog.example.com
+                    </p>
+                    
+                    <p class="card-text">
+                        <strong>Время работы:</strong><br>
+                        Пн-Пт: 9:00 - 18:00<br>
+                        Сб-Вс: 10:00 - 16:00
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Форма обратной связи -->
+        <div class="col-md-6">
+            <h2>Обратная связь</h2>
+            
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Напишите нам</h5>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Ваше имя *</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Сообщение *</label>
+                            <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Отправить сообщение</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Карта (заглушка) -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3>Как нас найти</h3>
+            <div class="ratio ratio-16x9">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2244.4!2d37.6173!3d55.7558!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNTXCsDQ1JzIwLjkiTiAzN8KwMzcnMDIuMyJF!5e0!3m2!1sru!2sru!4v1234567890" 
+                        style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </div>
+    </div>
+{% endblock %}
