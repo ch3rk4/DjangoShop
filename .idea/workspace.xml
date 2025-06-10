@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment=" refresh base" />
+    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="create test_crud">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,8 +15,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Python Script" />
         <option value="HTML File" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
@@ -50,10 +52,40 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "DefaultHtmlFileTemplate": "HTML File",
+    "Python.test_crud.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "HW5"
   }
 }]]></component>
+  <component name="RunManager">
+    <configuration name="test_crud" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="DjangoShop" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test/test_crud.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.test_crud" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -390,7 +422,23 @@
       <option name="project" value="LOCAL" />
       <updated>1749568354547</updated>
     </task>
-    <option name="localTasksCounter" value="41" />
+    <task id="LOCAL-00041" summary=" refresh home">
+      <option name="closed" value="true" />
+      <created>1749568404950</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1749568404950</updated>
+    </task>
+    <task id="LOCAL-00042" summary="create test_crud">
+      <option name="closed" value="true" />
+      <created>1749568549809</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1749568549809</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -417,8 +465,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="create custom commands" />
-    <MESSAGE value="refresh home.html" />
     <MESSAGE value="final" />
     <MESSAGE value="gitignore" />
     <MESSAGE value="gitignore2" />
@@ -442,6 +488,8 @@
     <MESSAGE value="refresh urls" />
     <MESSAGE value="fix forms and create product_form, product_confirm; refresh base" />
     <MESSAGE value=" refresh base" />
-    <option name="LAST_COMMIT_MESSAGE" value=" refresh base" />
+    <MESSAGE value=" refresh home" />
+    <MESSAGE value="create test_crud" />
+    <option name="LAST_COMMIT_MESSAGE" value="create test_crud" />
   </component>
 </project>
