@@ -74,7 +74,7 @@ class BlogPost(models.Model):
         """
         Возвращает URL для просмотра конкретной записи.
         """
-        return reverse('blog:post_detail', kwargs={'pk': self.pk})
+        return reverse('blog:detail', kwargs={'pk': self.pk})  # ИСПРАВЛЕНО: правильное имя URL
 
     def get_short_content(self, words_count=50):
         """
