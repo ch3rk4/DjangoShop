@@ -1,0 +1,485 @@
+<!-- Наследуем от базового шаблона -->
+{% extends 'catalog/base.html' %}
+
+<!-- Заголовок страницы -->
+{% block title %}{{ page_title }} - Каталог товаров{% endblock %}
+
+<!-- Дополнительные стили для формы -->
+{% block extra_css %}
+<style>
+    /* Стили для улучшения внешнего вида формы */
+    .form-container {
+        background: #ffffff;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e9ecef;
+    }
+
+    /* Стили для обязательных полей */
+    .required-field label::after {
+        content: ' *';
+        color: #dc3545;
+        font-weight: bold;
+    }
+
+    /* Стили для превью изображения */
+    .image-preview {
+        max-width: 200px;
+        max-height: 200px;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: none; /* Скрыто по умолчанию */
+        margin-top: 0.5rem;
+    }
+
+    /* Стили для текущего изображения при редактировании */
+    .current-image {
+        max-width: 150px;
+        max-height: 150px;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Анимация для кнопки отправки */
+    .btn-submit {
+        transition: all 0.3s ease;
+        min-width: 150px;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Стили для блока с ошибками */
+    .error-summary {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Стили для подсказок */
+    .help-text {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+
+    /* Стили для счетчика символов */
+    .char-counter {
+        font-size: 0.75rem;
+        color: #6c757d;
+        text-align: right;
+        margin-top: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+<!-- Основной контент -->
+{% block content %}
+    <!-- Заголовок страницы -->
+    <div class="row">
+        <div class="col-12 text-center mb-4">
+            <h1 class="display-5">
+                {% if form_action == 'create' %}
+                    <i class="bi bi-plus-circle text-primary"></i>
+                    {{ page_title }}
+                {% else %}
+                    <i class="bi bi-pencil-square text-warning"></i>
+                    {{ page_title }}
+                {% endif %}
+            </h1>
+            <p class="lead text-muted">
+                {% if form_action == 'create' %}
+                    Заполните форму для добавления нового товара в каталог
+                {% else %}
+                    Внесите необходимые изменения в информацию о товаре
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <!-- Контейнер формы -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="form-container">
+
+                <!-- Сводка ошибок формы (если есть) -->
+                {% if form.non_field_errors %}
+                    <div class="error-summary">
+                        <h5 class="text-danger mb-2">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            Обнаружены ошибки в форме
+                        </h5>
+                        {% for error in form.non_field_errors %}
+                            <p class="mb-1 text-danger">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- Инструкции для пользователя -->
+                <div class="alert alert-info mb-4">
+                    <h6 class="alert-heading">
+                        <i class="bi bi-info-circle"></i> Правила заполнения формы
+                    </h6>
+                    <ul class="mb-0 small">
+                        <li>Поля, отмеченные звездочкой (*), обязательны для заполнения</li>
+                        <li>В названии и описании нельзя использовать запрещенные слова</li>
+                        <li>Цена должна быть положительным числом</li>
+                        <li>Изображения принимаются в форматах JPG, PNG (до 5 МБ)</li>
+                    </ul>
+                </div>
+
+                <!-- Сама форма -->
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    <!-- Токен CSRF для защиты от атак -->
+                    {% csrf_token %}
+
+                    <!-- Поле названия товара -->
+                    <div class="mb-3 required-field">
+                        <label for="{{ form.name.id_for_label }}" class="form-label fw-bold">
+                            <i class="bi bi-tag"></i> {{ form.name.label }}
+                        </label>
+
+                        {{ form.name }}
+
+                        <!-- Счетчик символов для названия -->
+                        <div class="char-counter">
+                            <span id="name-counter">0</span> / 200 символов
+                        </div>
+
+                        <!-- Показываем ошибки поля -->
+                        {% if form.name.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.name.errors %}
+                                    <div><i class="bi bi-exclamation-circle"></i> {{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <!-- Текст помощи -->
+                        {% if form.name.help_text %}
+                            <div class="help-text">
+                                <i class="bi bi-question-circle"></i> {{ form.name.help_text }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Поле описания товара -->
+                    <div class="mb-3">
+                        <label for="{{ form.description.id_for_label }}" class="form-label fw-bold">
+                            <i class="bi bi-text-paragraph"></i> {{ form.description.label }}
+                        </label>
+
+                        {{ form.description }}
+
+                        <!-- Счетчик символов для описания -->
+                        <div class="char-counter">
+                            <span id="description-counter">0</span> символов
+                        </div>
+
+                        {% if form.description.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.description.errors %}
+                                    <div><i class="bi bi-exclamation-circle"></i> {{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        {% if form.description.help_text %}
+                            <div class="help-text">
+                                <i class="bi bi-question-circle"></i> {{ form.description.help_text }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Поле выбора категории -->
+                    <div class="mb-3 required-field">
+                        <label for="{{ form.category.id_for_label }}" class="form-label fw-bold">
+                            <i class="bi bi-collection"></i> {{ form.category.label }}
+                        </label>
+
+                        {{ form.category }}
+
+                        {% if form.category.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.category.errors %}
+                                    <div><i class="bi bi-exclamation-circle"></i> {{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        {% if form.category.help_text %}
+                            <div class="help-text">
+                                <i class="bi bi-question-circle"></i> {{ form.category.help_text }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Поле цены -->
+                    <div class="mb-3 required-field">
+                        <label for="{{ form.price.id_for_label }}" class="form-label fw-bold">
+                            <i class="bi bi-currency-exchange"></i> {{ form.price.label }}
+                        </label>
+
+                        <div class="input-group">
+                            {{ form.price }}
+                            <span class="input-group-text">₽</span>
+                        </div>
+
+                        {% if form.price.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.price.errors %}
+                                    <div><i class="bi bi-exclamation-circle"></i> {{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        {% if form.price.help_text %}
+                            <div class="help-text">
+                                <i class="bi bi-question-circle"></i> {{ form.price.help_text }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Поле загрузки изображения -->
+                    <div class="mb-4">
+                        <label for="{{ form.image.id_for_label }}" class="form-label fw-bold">
+                            <i class="bi bi-image"></i> {{ form.image.label }}
+                        </label>
+
+                        <!-- Показываем текущее изображение при редактировании -->
+                        {% if object and object.image %}
+                            <div class="mb-2">
+                                <small class="text-muted">Текущее изображение:</small><br>
+                                <img src="{{ object.image.url }}"
+                                     alt="Текущее изображение товара"
+                                     class="current-image">
+                                <div class="mt-1">
+                                    <small class="text-muted">
+                                        Выберите новый файл, чтобы заменить изображение
+                                    </small>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {{ form.image }}
+
+                        <!-- Контейнер для превью нового изображения -->
+                        <div class="mt-2">
+                            <img id="image-preview" class="image-preview" alt="Превью изображения">
+                        </div>
+
+                        {% if form.image.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.image.errors %}
+                                    <div><i class="bi bi-exclamation-circle"></i> {{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        {% if form.image.help_text %}
+                            <div class="help-text">
+                                <i class="bi bi-question-circle"></i> {{ form.image.help_text }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Кнопки управления формой -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <!-- Кнопка отмены -->
+                        <a href="{% if object %}{% url 'catalog:product_detail' object.pk %}{% else %}{% url 'catalog:home' %}{% endif %}"
+                           class="btn btn-outline-secondary me-md-2">
+                            <i class="bi bi-x-circle"></i> Отмена
+                        </a>
+
+                        <!-- Кнопка отправки формы -->
+                        <button type="submit" class="btn btn-primary btn-submit">
+                            <i class="bi bi-check-circle"></i> {{ submit_text }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Дополнительные подсказки -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-info">
+                <div class="card-body">
+                    <h6 class="card-title text-info">
+                        <i class="bi bi-lightbulb"></i> Полезные советы
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="small mb-2"><strong>Название товара:</strong></p>
+                            <ul class="small mb-3">
+                                <li>Используйте краткие, но информативные названия</li>
+                                <li>Избегайте запрещенных слов: казино, крипта, обман и др.</li>
+                                <li>Минимум 3 символа, максимум 200</li>
+                            </ul>
+
+                            <p class="small mb-2"><strong>Цена:</strong></p>
+                            <ul class="small mb-3">
+                                <li>Указывайте цену в рублях</li>
+                                <li>Цена должна быть больше 0</li>
+                                <li>Можно использовать копейки (например: 1500.50)</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="small mb-2"><strong>Описание:</strong></p>
+                            <ul class="small mb-3">
+                                <li>Опишите ключевые характеристики товара</li>
+                                <li>Для дорогих товаров (>50,000₽) нужно подробное описание</li>
+                                <li>Избегайте тех же запрещенных слов</li>
+                            </ul>
+
+                            <p class="small mb-2"><strong>Изображение:</strong></p>
+                            <ul class="small mb-0">
+                                <li>Форматы: JPG, PNG</li>
+                                <li>Максимальный размер: 5 МБ</li>
+                                <li>Лучше всего подходят квадратные изображения</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+<!-- JavaScript для улучшения пользовательского опыта -->
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Находим элементы формы
+        const nameField = document.querySelector('input[name="name"]');
+        const descriptionField = document.querySelector('textarea[name="description"]');
+        const imageInput = document.querySelector('input[name="image"]');
+        const imagePreview = document.getElementById('image-preview');
+        const form = document.querySelector('form');
+
+        // Функция для обновления счетчика символов
+        function updateCharCounter(field, counterId, maxLength = null) {
+            const counter = document.getElementById(counterId);
+            if (counter && field) {
+                const length = field.value.length;
+                counter.textContent = length;
+
+                // Меняем цвет счетчика в зависимости от заполненности
+                if (maxLength) {
+                    if (length > maxLength * 0.9) {
+                        counter.style.color = '#dc3545'; // Красный
+                    } else if (length > maxLength * 0.7) {
+                        counter.style.color = '#fd7e14'; // Оранжевый
+                    } else {
+                        counter.style.color = '#6c757d'; // Серый
+                    }
+                }
+            }
+        }
+
+        // Инициализируем счетчики символов
+        if (nameField) {
+            updateCharCounter(nameField, 'name-counter', 200);
+            nameField.addEventListener('input', function() {
+                updateCharCounter(this, 'name-counter', 200);
+            });
+        }
+
+        if (descriptionField) {
+            updateCharCounter(descriptionField, 'description-counter');
+            descriptionField.addEventListener('input', function() {
+                updateCharCounter(this, 'description-counter');
+            });
+        }
+
+        // Функция для показа превью изображения
+        if (imageInput && imagePreview) {
+            imageInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+
+                if (file) {
+                    // Проверяем, что это изображение
+                    if (file.type.startsWith('image/')) {
+                        // Проверяем размер файла
+                        const maxSize = 5 * 1024 * 1024; // 5 МБ
+                        if (file.size > maxSize) {
+                            alert('Размер файла превышает 5 МБ. Пожалуйста, выберите файл меньшего размера.');
+                            this.value = '';
+                            imagePreview.style.display = 'none';
+                            return;
+                        }
+
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            imagePreview.src = e.target.result;
+                            imagePreview.style.display = 'block';
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        alert('Пожалуйста, выберите файл изображения (JPG, PNG)');
+                        this.value = '';
+                        imagePreview.style.display = 'none';
+                    }
+                } else {
+                    imagePreview.style.display = 'none';
+                }
+            });
+        }
+
+        // Валидация формы перед отправкой
+        if (form) {
+            form.addEventListener('submit', function(event) {
+                const submitButton = form.querySelector('button[type="submit"]');
+
+                // Показываем индикатор загрузки
+                if (submitButton) {
+                    submitButton.innerHTML = '<i class="bi bi-hourglass-split"></i> Сохраняем...';
+                    submitButton.disabled = true;
+                }
+
+                // Проверяем заполненность обязательных полей
+                const requiredFields = form.querySelectorAll('[required]');
+                let hasErrors = false;
+
+                requiredFields.forEach(function(field) {
+                    if (!field.value.trim()) {
+                        field.classList.add('is-invalid');
+                        hasErrors = true;
+                    } else {
+                        field.classList.remove('is-invalid');
+                        field.classList.add('is-valid');
+                    }
+                });
+
+                // Если есть ошибки, останавливаем отправку
+                if (hasErrors) {
+                    event.preventDefault();
+                    if (submitButton) {
+                        submitButton.innerHTML = '<i class="bi bi-check-circle"></i> {{ submit_text }}';
+                        submitButton.disabled = false;
+                    }
+                    alert('Пожалуйста, заполните все обязательные поля');
+                }
+            });
+        }
+
+        // Автоматическое изменение размера textarea для описания
+        if (descriptionField) {
+            function autoResize() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            }
+
+            descriptionField.addEventListener('input', autoResize);
+            // Вызываем один раз для установки правильной высоты при загрузке
+            autoResize.call(descriptionField);
+        }
+    });
+</script>
+{% endblock %>
