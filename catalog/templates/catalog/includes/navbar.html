@@ -1,5 +1,3 @@
-
-
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <!-- Логотип/название сайта -->
@@ -28,7 +26,15 @@
                     </a>
                 </li>
 
-                <!-- Добавить товар (дополнительное задание) -->
+                <!-- Блог -->
+                <li class="nav-item">
+                    <a class="nav-link {% if 'blog' in request.resolver_match.namespace %}active{% endif %}"
+                       href="{% url 'blog:blog_list' %}">
+                        <i class="bi bi-journal-text"></i> Блог
+                    </a>
+                </li>
+
+                <!-- Добавить товар - ИСПРАВЛЕНО: используем add_product вместо add_product -->
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'add_product' %}active{% endif %}"
                        href="{% url 'catalog:add_product' %}">
@@ -36,7 +42,7 @@
                     </a>
                 </li>
 
-                <!-- Контакты -->
+                <!-- Контакты - ИСПРАВЛЕНО: используем contacts вместо contact -->
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'contacts' %}active{% endif %}"
                        href="{% url 'catalog:contacts' %}">
@@ -47,4 +53,3 @@
         </div>
     </div>
 </nav>
-

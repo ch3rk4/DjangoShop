@@ -47,9 +47,8 @@ class Category(models.Model):
     def get_absolute_url(self):
         """
         Возвращает URL для детального просмотра категории.
-        Пока что ведет на главную страницу, в ДЗ3 добавим страницу категории.
         """
-        return reverse('catalog:home')
+        return reverse('catalog:index')  # ИСПРАВЛЕНО: правильное имя URL
 
 
 class Product(models.Model):
@@ -120,9 +119,8 @@ class Product(models.Model):
     def get_absolute_url(self):
         """
         Возвращает URL для детального просмотра товара.
-        В ДЗ3 создадим соответствующий view и URL.
         """
-        return reverse('catalog:home')
+        return reverse('catalog:product_detail', kwargs={'pk': self.pk})  # ИСПРАВЛЕНО: правильный URL
 
     def get_short_description(self):
         """

@@ -11,7 +11,7 @@ class BlogListView(ListView):
     Страница со списком всех блоговых записей.
     """
     model = BlogPost
-    template_name = 'blog/blog_list.html'
+    template_name = 'blog/blogpost_list.html'  # ИСПРАВЛЕНО: правильное имя шаблона
     context_object_name = 'posts'
     paginate_by = 6  # Показываем по 6 статей на странице
 
@@ -34,7 +34,7 @@ class BlogDetailView(DetailView):
     Страница детального просмотра одной статьи.
     """
     model = BlogPost
-    template_name = 'blog/blog_detail.html'
+    template_name = 'blog/blogpost_detail.html'  # ИСПРАВЛЕНО: правильное имя шаблона
     context_object_name = 'post'
 
     def get_object(self, queryset=None):
@@ -95,9 +95,9 @@ class BlogCreateView(CreateView):
     Страница создания новой блоговой записи.
     """
     model = BlogPost
-    template_name = 'blog/blog_form.html'
+    template_name = 'blog/blogpost_form.html'  # ИСПРАВЛЕНО: правильное имя шаблона
     fields = ['title', 'content', 'preview_image', 'is_published']
-    success_url = reverse_lazy('blog:blog_list')
+    success_url = reverse_lazy('blog:list')  # ИСПРАВЛЕНО: правильное имя URL
 
     def form_valid(self, form):
         """
@@ -119,7 +119,7 @@ class BlogUpdateView(UpdateView):
     Страница редактирования существующей блоговой записи.
     """
     model = BlogPost
-    template_name = 'blog/blog_form.html'
+    template_name = 'blog/blogpost_form.html'  # ИСПРАВЛЕНО: правильное имя шаблона
     fields = ['title', 'content', 'preview_image', 'is_published']
 
     def get_success_url(self):
@@ -127,7 +127,7 @@ class BlogUpdateView(UpdateView):
         Определяет URL для перенаправления после успешного редактирования.
         """
         messages.success(self.request, 'Статья успешно обновлена!')
-        return reverse_lazy('blog:post_detail', kwargs={'pk': self.object.pk})
+        return reverse_lazy('blog:detail', kwargs={'pk': self.object.pk})  # ИСПРАВЛЕНО: правильное имя URL
 
     def get_context_data(self, **kwargs):
         """Добавляем информацию для шаблона."""
@@ -142,8 +142,8 @@ class BlogDeleteView(DeleteView):
     Страница подтверждения удаления блоговой записи.
     """
     model = BlogPost
-    template_name = 'blog/blog_confirm_delete.html'
-    success_url = reverse_lazy('blog:blog_list')
+    template_name = 'blog/blogpost_confirm_delete.html'  # ИСПРАВЛЕНО: правильное имя шаблона
+    success_url = reverse_lazy('blog:list')  # ИСПРАВЛЕНО: правильное имя URL
 
     def delete(self, request, *args, **kwargs):
         """Добавляем сообщение об успешном удалении."""

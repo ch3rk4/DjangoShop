@@ -21,7 +21,7 @@
 
             <!-- Призыв к действию -->
             <div class="mt-3">
-                <a class="btn btn-light btn-lg me-2" href="{% url 'catalog:product_create' %}" role="button">
+                <a class="btn btn-light btn-lg me-2" href="{% url 'catalog:add_product' %}" role="button">
                     <i class="bi bi-plus-circle"></i> Добавить товар
                 </a>
                 <a class="btn btn-outline-light btn-lg" href="{% url 'catalog:contacts' %}" role="button">
@@ -115,10 +115,6 @@
                                                class="btn btn-primary flex-grow-1">
                                                 <i class="bi bi-eye"></i> Подробнее
                                             </a>
-                                            <a href="{% url 'catalog:product_update' product.pk %}"
-                                               class="btn btn-outline-secondary">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -209,7 +205,7 @@
                             <a href="{% url 'catalog:home' %}" class="btn btn-primary">
                                 <i class="bi bi-arrow-left"></i> Вернуться к каталогу
                             </a>
-                            <a href="{% url 'catalog:product_create' %}" class="btn btn-success">
+                            <a href="{% url 'catalog:add_product' %}" class="btn btn-success">
                                 <i class="bi bi-plus"></i> Добавить товар
                             </a>
                         </div>
@@ -217,7 +213,7 @@
                         <h3>Каталог пуст</h3>
                         <p class="lead">В настоящее время товары отсутствуют</p>
                         <div class="mt-3">
-                            <a href="{% url 'catalog:product_create' %}" class="btn btn-primary btn-lg">
+                            <a href="{% url 'catalog:add_product' %}" class="btn btn-primary btn-lg">
                                 <i class="bi bi-plus-circle"></i> Добавить первый товар
                             </a>
                         </div>
