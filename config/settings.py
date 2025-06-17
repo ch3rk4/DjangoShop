@@ -65,11 +65,10 @@ TEMPLATES = [
     },
 ]
 
-# ИСПРАВЛЕНО: Правильный путь к WSGI приложению
+
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Настройки базы данных
-# Используем переменные окружения для гибкости настройки
+
 DATABASE_ENGINE = os.getenv('DB_ENGINE', 'django.db.backends.sqlite3')
 
 if DATABASE_ENGINE == 'django.db.backends.postgresql':
