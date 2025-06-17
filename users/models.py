@@ -61,6 +61,25 @@ class User(AbstractUser):
     # username удаляем из обязательных, так как используем email
     REQUIRED_FIELDS = ['username']
 
+    # КРИТИЧНО: Переопределяем related_name для избежания конфликтов
+    groups = models.ManyToManyField(
+        'auth.Group',
+        verbose_name='groups',
+        blank=True,
+        help_text='The groups this user belongs to.',
+        related_name='custom_user_set',  # Изменяем related_name
+        related_query_name='custom_user',
+    )
+
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        verbose_name='user permissions',
+        blank=True,
+        help_text='Specific permissions for this user.',
+        related_name='custom_user_set',  # Изменяем related_name
+        related_query_name='custom_user',
+    )
+
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
