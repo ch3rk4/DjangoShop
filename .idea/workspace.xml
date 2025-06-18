@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="fixes">
+  <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="fixes">
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_10_06_2025_17_43_[Changes]/shelved.patch" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_10_06_2025_17_43__Changes_.xml" beforeDir="false" />
@@ -384,6 +384,7 @@
       <option name="project" value="LOCAL" />
       <updated>1749559738572</updated>
     </task>
+</task>
     <task id="LOCAL-00036" summary="refresh forms">
       <option name="closed" value="true" />
       <created>1749566735585</created>
@@ -542,6 +543,7 @@
     <MESSAGE value="create views from blog" />
     <MESSAGE value="create urls for blog" />
     <MESSAGE value="refresh urls from config" />
+<MESSAGE value="fixes" />
     <MESSAGE value="refresh forms" />
     <MESSAGE value="refresh views" />
     <MESSAGE value="refresh urls" />
