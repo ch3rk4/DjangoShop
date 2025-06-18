@@ -1,0 +1,341 @@
+<!-- Наследуем от базового шаблона -->
+{% extends 'base.html' %}
+
+<!-- Заголовок страницы -->
+{% block title %}{{ page_title }} - {{ block.super }}{% endblock %}
+
+<!-- Дополнительные стили -->
+{% block extra_css %}
+<style>
+    /* Стили для приветственной страницы */
+    .welcome-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 1rem;
+        padding: 3rem 2rem;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        height: 100%;
+        transition: transform 0.3s ease;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 2rem;
+        color: white;
+    }
+
+    .stats-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .stats-number {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #667eea;
+    }
+
+    .auth-actions {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+
+    .btn-hero {
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 2rem;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-block;
+        margin: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-hero:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .user-greeting {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-top: 1rem;
+    }
+</style>
+{% endblock %}
+
+<!-- Основной контент -->
+{% block content %}
+<!-- Hero секция -->
+<div class="welcome-hero">
+    <div class="container-fluid">
+        {% if user.is_authenticated %}
+            <!-- Приветствие для авторизованных пользователей -->
+            <h1 class="display-4 fw-bold mb-3">
+                Добро пожаловать обратно, {{ user.get_full_name|default:user.username }}! 👋
+            </h1>
+            <p class="fs-5 mb-4">
+                Рады видеть вас снова в Django Shop!
+                Готовы продолжить работу с каталогом товаров и блогом?
+            </p>
+
+            <div class="user-greeting">
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <div class="mb-2">
+                            <i class="bi bi-person-circle" style="font-size: 2rem;"></i>
+                        </div>
+                        <h6>Ваш профиль</h6>
+                        <p class="small mb-0">
+                            Последний вход:
+                            {% if user.last_login %}
+                                {{ user.last_login|date:"d.m.Y H:i" }}
+                            {% else %}
+                                впервые в системе
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-2">
+                            <i class="bi bi-envelope-check" style="font-size: 2rem;"></i>
+                        </div>
+                        <h6>Email подтвержден</h6>
+                        <p class="small mb-0">{{ user.email }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-2">
+                            <i class="bi bi-shield-check" style="font-size: 2rem;"></i>
+                        </div>
+                        <h6>Аккаунт активен</h6>
+                        <p class="small mb-0">Полный доступ ко всем функциям</p>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <!-- Приветствие для неавторизованных пользователей -->
+            <h1 class="display-4 fw-bold mb-3">
+                Добро пожаловать в Django Shop! 🛍️
+            </h1>
+            <p class="fs-5 mb-4">
+                Современный интернет-магазин с удобным каталогом товаров и интересным блогом.
+                Присоединяйтесь к нашему сообществу!
+            </p>
+
+            <div class="auth-actions">
+                <h5 class="mb-3">Начните работу с нами:</h5>
+                <a href="{% url 'users:register' %}" class="btn-hero">
+                    <i class="bi bi-person-plus"></i> Регистрация
+                </a>
+                <a href="{% url 'users:login' %}" class="btn-hero">
+                    <i class="bi bi-box-arrow-in-right"></i> Вход
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Статистика сайта -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="stats-card">
+            <div class="stats-number">{{ total_users }}</div>
+            <div class="text-muted">Пользователей</div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="stats-card">
+            <div class="stats-number">∞</div>
+            <div class="text-muted">Возможностей</div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="stats-card">
+            <div class="stats-number">24/7</div>
+            <div class="text-muted">Доступность</div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="stats-card">
+            <div class="stats-number">100%</div>
+            <div class="text-muted">Надежность</div>
+        </div>
+    </div>
+</div>
+
+<!-- Основные возможности -->
+<div class="row">
+    <div class="col-12 mb-4">
+        <h2 class="text-center text-dark">Что вы можете делать:</h2>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Каталог товаров -->
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="bi bi-shop"></i>
+            </div>
+            <h4>Каталог товаров</h4>
+            <p class="text-muted mb-3">
+                Просматривайте товары, изучайте их характеристики и находите именно то, что нужно.
+            </p>
+            <a href="{% url 'catalog:home' %}" class="btn btn-outline-primary">
+                <i class="bi bi-eye"></i> Смотреть товары
+            </a>
+        </div>
+    </div>
+
+    <!-- Добавление товаров -->
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="bi bi-plus-circle"></i>
+            </div>
+            <h4>Добавление товаров</h4>
+            <p class="text-muted mb-3">
+                {% if user.is_authenticated %}
+                    Пополните каталог новыми интересными товарами и поделитесь находками.
+                {% else %}
+                    Зарегистрируйтесь, чтобы добавлять товары в каталог и делиться находками.
+                {% endif %}
+            </p>
+            {% if user.is_authenticated %}
+                <a href="{% url 'catalog:add_product' %}" class="btn btn-outline-success">
+                    <i class="bi bi-plus"></i> Добавить товар
+                </a>
+            {% else %}
+                <a href="{% url 'users:register' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-person-plus"></i> Регистрация
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Блог -->
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="bi bi-journal-text"></i>
+            </div>
+            <h4>Блог</h4>
+            <p class="text-muted mb-3">
+                Читайте интересные статьи и делитесь своими знаниями с сообществом.
+            </p>
+            <div class="d-flex gap-2 justify-content-center">
+                <a href="{% url 'blog:blog_list' %}" class="btn btn-outline-info btn-sm">
+                    <i class="bi bi-book"></i> Читать
+                </a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'blog:post_create' %}" class="btn btn-outline-success btn-sm">
+                        <i class="bi bi-pencil"></i> Писать
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Профиль (только для авторизованных) -->
+    {% if user.is_authenticated %}
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="bi bi-person-gear"></i>
+            </div>
+            <h4>Личный профиль</h4>
+            <p class="text-muted mb-3">
+                Управляйте своим профилем, обновляйте информацию и следите за активностью.
+            </p>
+            <a href="{% url 'users:profile' %}" class="btn btn-outline-primary">
+                <i class="bi bi-person"></i> Мой профиль
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Контакты -->
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="bi bi-envelope-heart"></i>
+            </div>
+            <h4>Связь с нами</h4>
+            <p class="text-muted mb-3">
+                Есть вопросы или предложения? Мы всегда рады помочь и выслушать ваше мнение.
+            </p>
+            <a href="{% url 'catalog:contacts' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-envelope"></i> Контакты
+            </a>
+        </div>
+    </div>
+
+    <!-- Технологии -->
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="bi bi-code-slash"></i>
+            </div>
+            <h4>Современные технологии</h4>
+            <p class="text-muted mb-3">
+                Проект построен на Django с использованием современных веб-технологий.
+            </p>
+            <div class="small">
+                <span class="badge bg-primary me-1">Django</span>
+                <span class="badge bg-info me-1">Bootstrap</span>
+                <span class="badge bg-success">PostgreSQL</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Призыв к действию для неавторизованных -->
+{% if not user.is_authenticated %}
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="text-center bg-light rounded p-4">
+            <h3 class="mb-3">Готовы начать?</h3>
+            <p class="text-muted mb-4">
+                Присоединяйтесь к Django Shop и получите доступ ко всем возможностям платформы!
+            </p>
+            <div class="d-flex gap-3 justify-content-center">
+                <a href="{% url 'users:register' %}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-person-plus"></i> Создать аккаунт
+                </a>
+                <a href="{% url 'users:login' %}" class="btn btn-outline-primary btn-lg">
+                    <i class="bi bi-box-arrow-in-right"></i> Войти
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

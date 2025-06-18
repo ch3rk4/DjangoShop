@@ -1,6 +1,6 @@
 """
 Django settings for config project.
-Исправленная версия с правильными настройками для запуска сервера.
+Исправленная версия с правильными настройками для пользователей.
 """
 
 import os
@@ -65,11 +65,11 @@ TEMPLATES = [
     },
 ]
 
-# ИСПРАВЛЕНО: Правильный путь к WSGI приложению
 WSGI_APPLICATION = 'config.wsgi.application'
 
+AUTH_USER_MODEL = 'users.User'
+
 # Настройки базы данных
-# Используем переменные окружения для гибкости настройки
 DATABASE_ENGINE = os.getenv('DB_ENGINE', 'django.db.backends.sqlite3')
 
 if DATABASE_ENGINE == 'django.db.backends.postgresql':
@@ -88,7 +88,6 @@ if DATABASE_ENGINE == 'django.db.backends.postgresql':
         }
     }
 else:
-    # Настройки для SQLite (для разработки)
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -111,6 +110,15 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# URL для перенаправления после успешного входа
+LOGIN_REDIRECT_URL = '/'  # Главная страница каталога
+
+# URL для перенаправления после выхода
+LOGOUT_REDIRECT_URL = '/'  # Главная страница каталога
+
+# URL страницы входа (куда перенаправлять неавторизованных пользователей)
+LOGIN_URL = '/users/login/'
 
 # Настройки локализации
 LANGUAGE_CODE = 'ru-ru'
@@ -138,10 +146,13 @@ EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.Em
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@djangoshop.com')
 ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'admin@djangoshop.com')
 
-# Для продакшена настройте SMTP:
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'your-email@gmail.com'
-# EMAIL_HOST_PASSWORD = 'your-app-password'
+if not DEBUG:
+    # Используйте HTTPS в продакшене
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 год
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+    # Защита сессий
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
