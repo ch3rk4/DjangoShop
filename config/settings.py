@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Наши кастомные приложения
+    'users',    # Пользователи и аутентификация
     'catalog',  # Каталог товаров
     'blog',     # Блог
 ]
