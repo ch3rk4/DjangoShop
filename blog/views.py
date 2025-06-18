@@ -1,4 +1,5 @@
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.core.mail import send_mail
 from django.conf import settings
@@ -9,15 +10,20 @@ from .models import BlogPost
 class BlogListView(ListView):
     """
     Страница со списком всех блоговых записей.
+
+    ОБЩЕДОСТУПНАЯ - любой посетитель может читать статьи блога.
+    Это как читальный зал библиотеки - открыт для всех.
     """
     model = BlogPost
-    template_name = 'blog/blogpost_list.html'  # ИСПРАВЛЕНО: правильное имя шаблона
+    template_name = 'blog/blog_list.html'
     context_object_name = 'posts'
     paginate_by = 6  # Показываем по 6 статей на странице
 
     def get_queryset(self):
         """
         Фильтруем только опубликованные статьи.
+
+        Неопубликованные статьи (черновики) не показываем обычным посетителям.
         """
         return BlogPost.objects.filter(is_published=True).order_by('-created_date')
 
@@ -32,10 +38,20 @@ class BlogListView(ListView):
 class BlogDetailView(DetailView):
     """
     Страница детального просмотра одной статьи.
+
+    ОБЩЕДОСТУПНАЯ - любой может прочитать опубликованную статью.
     """
     model = BlogPost
-    template_name = 'blog/blogpost_detail.html'  # ИСПРАВЛЕНО: правильное имя шаблона
+    template_name = 'blog/blog_detail.html'
     context_object_name = 'post'
+
+    def get_queryset(self):
+        """
+        Показываем только опубликованные статьи.
+
+        Это предотвращает доступ к черновикам через прямую ссылку.
+        """
+        return BlogPost.objects.filter(is_published=True)
 
     def get_object(self, queryset=None):
         """
@@ -90,20 +106,35 @@ class BlogDetailView(DetailView):
             print(f"❌ Ошибка отправки email: {e}")
 
 
-class BlogCreateView(CreateView):
+class BlogCreateView(LoginRequiredMixin, CreateView):
     """
     Страница создания новой блоговой записи.
+
+    ТРЕБУЕТ АВТОРИЗАЦИИ - только зарегистрированные пользователи могут создавать статьи.
+    LoginRequiredMixin автоматически перенаправляет неавторизованных на страницу входа.
     """
     model = BlogPost
-    template_name = 'blog/blogpost_form.html'  # ИСПРАВЛЕНО: правильное имя шаблона
+    template_name = 'blog/blog_form.html'
     fields = ['title', 'content', 'preview_image', 'is_published']
-    success_url = reverse_lazy('blog:list')  # ИСПРАВЛЕНО: правильное имя URL
+    success_url = reverse_lazy('blog:list')
+
+    # Настройки для LoginRequiredMixin
+    login_url = '/users/login/'
+    permission_denied_message = 'Для создания статей необходимо войти в систему'
 
     def form_valid(self, form):
         """
         Вызывается при успешной валидации формы.
+
+        Можно добавить связь статьи с автором, если в модели есть соответствующее поле.
         """
-        messages.success(self.request, 'Статья успешно создана!')
+        # Если в модели BlogPost есть поле author, можно добавить:
+        # form.instance.author = self.request.user
+
+        messages.success(
+            self.request,
+            f'Статья "{form.instance.title}" успешно {'опубликована' if form.instance.is_published else 'сохранена как черновик'}!'
+        )
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -111,47 +142,93 @@ class BlogCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         context['page_title'] = 'Создание новой статьи'
         context['form_action'] = 'create'
+        context['submit_text'] = 'Создать статью'
         return context
 
 
-class BlogUpdateView(UpdateView):
+class BlogUpdateView(LoginRequiredMixin, UpdateView):
     """
     Страница редактирования существующей блоговой записи.
+
+    ТРЕБУЕТ АВТОРИЗАЦИИ - только авторизованные пользователи могут редактировать статьи.
     """
     model = BlogPost
-    template_name = 'blog/blogpost_form.html'  # ИСПРАВЛЕНО: правильное имя шаблона
+    template_name = 'blog/blog_form.html'
     fields = ['title', 'content', 'preview_image', 'is_published']
+    login_url = '/users/login/'
 
     def get_success_url(self):
         """
         Определяет URL для перенаправления после успешного редактирования.
         """
         messages.success(self.request, 'Статья успешно обновлена!')
-        return reverse_lazy('blog:detail', kwargs={'pk': self.object.pk})  # ИСПРАВЛЕНО: правильное имя URL
+        return reverse_lazy('blog:detail', kwargs={'pk': self.object.pk})
 
     def get_context_data(self, **kwargs):
         """Добавляем информацию для шаблона."""
         context = super().get_context_data(**kwargs)
         context['page_title'] = f'Редактирование: {self.object.title}'
         context['form_action'] = 'update'
+        context['submit_text'] = 'Сохранить изменения'
         return context
 
 
-class BlogDeleteView(DeleteView):
+class BlogDeleteView(LoginRequiredMixin, DeleteView):
     """
     Страница подтверждения удаления блоговой записи.
+
+    ТРЕБУЕТ АВТОРИЗАЦИИ - только авторизованные пользователи могут удалять статьи.
     """
     model = BlogPost
-    template_name = 'blog/blogpost_confirm_delete.html'  # ИСПРАВЛЕНО: правильное имя шаблона
-    success_url = reverse_lazy('blog:list')  # ИСПРАВЛЕНО: правильное имя URL
+    template_name = 'blog/blog_confirm_delete.html'
+    success_url = reverse_lazy('blog:list')
+    login_url = '/users/login/'
 
     def delete(self, request, *args, **kwargs):
         """Добавляем сообщение об успешном удалении."""
-        messages.success(request, 'Статья успешно удалена!')
-        return super().delete(request, *args, **kwargs)
+        post_title = self.get_object().title
+        response = super().delete(request, *args, **kwargs)
+        messages.success(
+            request,
+            f'Статья "{post_title}" успешно удалена!'
+        )
+        return response
 
     def get_context_data(self, **kwargs):
         """Добавляем заголовок страницы."""
         context = super().get_context_data(**kwargs)
         context['page_title'] = f'Удаление статьи: {self.object.title}'
         return context
+
+
+"""
+ОБЪЯСНЕНИЕ БЕЗОПАСНОСТИ БЛОГА:
+
+1. ОБЩЕДОСТУПНЫЕ страницы:
+   - BlogListView - список опубликованных статей
+   - BlogDetailView - чтение опубликованных статей
+
+   Работают как публичная библиотека - читать могут все.
+
+2. ЗАЩИЩЕННЫЕ страницы (с LoginRequiredMixin):
+   - BlogCreateView - создание новых статей
+   - BlogUpdateView - редактирование статей
+   - BlogDeleteView - удаление статей
+
+   Работают как редакционный отдел - только для авторизованных "журналистов".
+
+3. Дополнительная безопасность:
+   - Показываем только опубликованные статьи (is_published=True)
+   - Черновики не доступны через прямые ссылки
+   - Счетчик просмотров работает для всех посетителей
+   - Поздравительные письма при достижении 100 просмотров
+
+4. Будущие улучшения:
+   - Можно добавить поле author в BlogPost модель
+   - Разрешить редактирование только своих статей
+   - Добавить модерацию статей перед публикацией
+   - Система тегов и категорий для статей
+
+Такая архитектура обеспечивает баланс между открытостью контента 
+и контролем за его созданием.
+"""

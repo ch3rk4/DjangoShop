@@ -1,0 +1,375 @@
+<!-- Наследуем от базового шаблона -->
+{% extends 'base.html' %}
+
+<!-- Заголовок страницы -->
+{% block title %}{{ page_title }} - {{ block.super }}{% endblock %}
+
+<!-- Дополнительные стили для формы входа -->
+{% block extra_css %}
+<style>
+    /* Стили для элегантной формы входа */
+    .login-container {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        margin: -2rem -15px 0;
+        padding: 2rem 15px;
+    }
+
+    .login-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 1rem;
+        padding: 2.5rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        max-width: 400px;
+        width: 100%;
+    }
+
+    .login-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .login-header h1 {
+        color: #333;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    .login-header p {
+        color: #666;
+        margin-bottom: 0;
+    }
+
+    .login-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 2rem;
+        color: white;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control:focus {
+        border-color: #4facfe;
+        box-shadow: 0 0 0 0.2rem rgba(79, 172, 254, 0.25);
+    }
+
+    .btn-login {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        border: none;
+        padding: 0.75rem 2rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+    }
+
+    .additional-links {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .additional-links a {
+        color: #4facfe;
+        text-decoration: none;
+        margin: 0 0.5rem;
+        font-weight: 500;
+    }
+
+    .additional-links a:hover {
+        text-decoration: underline;
+    }
+
+    .remember-me {
+        margin-bottom: 1rem;
+    }
+
+    .alert-info {
+        background: rgba(79, 172, 254, 0.1);
+        border-color: rgba(79, 172, 254, 0.3);
+        color: #0c5460;
+    }
+
+    /* Анимация для неправильного пароля */
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+
+    .shake {
+        animation: shake 0.5s ease-in-out;
+    }
+</style>
+{% endblock %}
+
+<!-- Основной контент -->
+{% block content %}
+<div class="login-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="login-card">
+                    <!-- Заголовок формы -->
+                    <div class="login-header">
+                        <div class="login-icon">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                        <h1>Вход в систему</h1>
+                        <p class="text-muted">
+                            Войдите в свой аккаунт для продолжения
+                        </p>
+                    </div>
+
+                    <!-- Информационное сообщение для новых пользователей -->
+                    {% if not user.is_authenticated %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i>
+                            <strong>Подсказка:</strong> Вы можете войти используя email или имя пользователя.
+                        </div>
+                    {% endif %}
+
+                    <!-- Форма входа -->
+                    <form method="post" novalidate id="loginForm">
+                        {% csrf_token %}
+
+                        <!-- Имя пользователя или email -->
+                        <div class="form-group">
+                            <label for="{{ form.username.id_for_label }}" class="form-label">
+                                <i class="bi bi-person"></i>
+                                {{ form.username.label }}
+                            </label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.username.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Пароль -->
+                        <div class="form-group">
+                            <label for="{{ form.password.id_for_label }}" class="form-label">
+                                <i class="bi bi-lock"></i>
+                                {{ form.password.label }}
+                            </label>
+                            <div class="input-group">
+                                {{ form.password }}
+                                <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                                    <i class="bi bi-eye" id="togglePasswordIcon"></i>
+                                </button>
+                            </div>
+                            {% if form.password.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.password.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Запомнить меня (опционально) -->
+                        <div class="form-check remember-me">
+                            <input class="form-check-input" type="checkbox" name="remember_me" id="remember_me">
+                            <label class="form-check-label" for="remember_me">
+                                Запомнить меня
+                            </label>
+                        </div>
+
+                        <!-- Общие ошибки формы -->
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger" id="loginErrors">
+                                {% for error in form.non_field_errors %}
+                                    <div>
+                                        <i class="bi bi-exclamation-triangle"></i>
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <!-- Кнопка входа -->
+                        <button type="submit" class="btn btn-primary btn-login">
+                            <i class="bi bi-box-arrow-in-right"></i> {{ submit_text }}
+                        </button>
+                    </form>
+
+                    <!-- Дополнительные ссылки -->
+                    <div class="additional-links">
+                        <p class="text-muted mb-2">
+                            Нет аккаунта?
+                            <a href="{% url 'users:register' %}">
+                                Зарегистрироваться
+                            </a>
+                        </p>
+
+                        <!-- Заглушка для восстановления пароля (можно добавить в будущем) -->
+                        <p class="text-muted mb-0">
+                            <a href="#" onclick="alert('Функция восстановления пароля будет добавлена в следующих версиях'); return false;">
+                                Забыли пароль?
+                            </a>
+                        </p>
+                    </div>
+
+                    <!-- Информация о системе -->
+                    <div class="mt-4 text-center">
+                        <small class="text-muted">
+                            <i class="bi bi-shield-check"></i>
+                            Ваши данные защищены и шифруются
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- JavaScript для улучшения формы входа -->
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('loginForm');
+    const passwordField = document.querySelector('input[name="password"]');
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    const togglePasswordIcon = document.getElementById('togglePasswordIcon');
+    const loginErrors = document.getElementById('loginErrors');
+
+    // Переключение видимости пароля
+    if (togglePasswordBtn && passwordField && togglePasswordIcon) {
+        togglePasswordBtn.addEventListener('click', function() {
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+
+            // Меняем иконку
+            if (type === 'text') {
+                togglePasswordIcon.className = 'bi bi-eye-slash';
+            } else {
+                togglePasswordIcon.className = 'bi bi-eye';
+            }
+        });
+    }
+
+    // Обработка отправки формы
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const submitButton = form.querySelector('button[type="submit"]');
+
+            // Показываем индикатор загрузки
+            if (submitButton) {
+                submitButton.innerHTML = '<i class="bi bi-hourglass-split"></i> Входим в систему...';
+                submitButton.disabled = true;
+            }
+
+            // Убираем предыдущие ошибки
+            const fields = form.querySelectorAll('.is-invalid');
+            fields.forEach(field => field.classList.remove('is-invalid'));
+
+            // Простая валидация
+            const username = form.querySelector('input[name="username"]').value.trim();
+            const password = form.querySelector('input[name="password"]').value;
+            let hasErrors = false;
+
+            if (!username) {
+                form.querySelector('input[name="username"]').classList.add('is-invalid');
+                hasErrors = true;
+            }
+
+            if (!password) {
+                form.querySelector('input[name="password"]').classList.add('is-invalid');
+                hasErrors = true;
+            }
+
+            // Если есть ошибки, останавливаем отправку
+            if (hasErrors) {
+                e.preventDefault();
+                if (submitButton) {
+                    submitButton.innerHTML = '<i class="bi bi-box-arrow-in-right"></i> {{ submit_text }}';
+                    submitButton.disabled = false;
+                }
+
+                // Добавляем анимацию тряски для привлечения внимания
+                form.classList.add('shake');
+                setTimeout(() => form.classList.remove('shake'), 500);
+
+                return false;
+            }
+        });
+    }
+
+    // Если есть ошибки входа, добавляем анимацию
+    if (loginErrors) {
+        loginErrors.parentElement.classList.add('shake');
+        setTimeout(() => {
+            if (loginErrors.parentElement) {
+                loginErrors.parentElement.classList.remove('shake');
+            }
+        }, 500);
+    }
+
+    // Автофокус на первое поле при загрузке страницы
+    const firstInput = form.querySelector('input[name="username"]');
+    if (firstInput) {
+        firstInput.focus();
+    }
+
+    // Обработка Enter для быстрого входа
+    form.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            const submitButton = form.querySelector('button[type="submit"]');
+            if (submitButton && !submitButton.disabled) {
+                submitButton.click();
+            }
+        }
+    });
+
+    // Показываем подсказку о caps lock
+    if (passwordField) {
+        passwordField.addEventListener('keydown', function(e) {
+            if (e.getModifierState && e.getModifierState('CapsLock')) {
+                let capsWarning = document.getElementById('caps-warning');
+                if (!capsWarning) {
+                    capsWarning = document.createElement('div');
+                    capsWarning.id = 'caps-warning';
+                    capsWarning.className = 'alert alert-warning mt-2';
+                    capsWarning.innerHTML = '<i class="bi bi-exclamation-triangle"></i> Внимание: включен Caps Lock';
+                    passwordField.parentNode.appendChild(capsWarning);
+                }
+            } else {
+                const capsWarning = document.getElementById('caps-warning');
+                if (capsWarning) {
+                    capsWarning.remove();
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %>

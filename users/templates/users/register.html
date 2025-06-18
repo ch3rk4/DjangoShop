@@ -1,0 +1,460 @@
+<!-- Наследуем от базового шаблона -->
+{% extends 'base.html' %}
+
+<!-- Заголовок страницы -->
+{% block title %}{{ page_title }} - {{ block.super }}{% endblock %}
+
+<!-- Дополнительные стили для формы регистрации -->
+{% block extra_css %}
+<style>
+    /* Стили для красивой формы регистрации */
+    .registration-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        margin: -2rem -15px 0;
+        padding: 2rem 15px;
+    }
+
+    .registration-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        max-width: 500px;
+        width: 100%;
+    }
+
+    .registration-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .registration-header h1 {
+        color: #333;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    .registration-header p {
+        color: #666;
+        margin-bottom: 0;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+
+    .btn-register {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        padding: 0.75rem 2rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .required-indicator {
+        color: #dc3545;
+        font-weight: bold;
+    }
+
+    .help-text {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+
+    .password-strength {
+        margin-top: 0.5rem;
+    }
+
+    .password-strength-bar {
+        height: 4px;
+        background: #e9ecef;
+        border-radius: 2px;
+        overflow: hidden;
+        margin-top: 0.25rem;
+    }
+
+    .password-strength-fill {
+        height: 100%;
+        transition: all 0.3s ease;
+        background: #dc3545;
+    }
+
+    .password-strength-fill.weak { background: #dc3545; width: 25%; }
+    .password-strength-fill.fair { background: #ffc107; width: 50%; }
+    .password-strength-fill.good { background: #28a745; width: 75%; }
+    .password-strength-fill.strong { background: #20c997; width: 100%; }
+</style>
+{% endblock %}
+
+<!-- Основной контент -->
+{% block content %}
+<div class="registration-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="registration-card">
+                    <!-- Заголовок формы -->
+                    <div class="registration-header">
+                        <h1>
+                            <i class="bi bi-person-plus text-primary"></i>
+                            Регистрация
+                        </h1>
+                        <p class="text-muted">
+                            Создайте аккаунт для доступа ко всем возможностям сайта
+                        </p>
+                    </div>
+
+                    <!-- Форма регистрации -->
+                    <form method="post" enctype="multipart/form-data" novalidate id="registrationForm">
+                        {% csrf_token %}
+
+                        <!-- Имя пользователя -->
+                        <div class="form-group">
+                            <label for="{{ form.username.id_for_label }}" class="form-label">
+                                <i class="bi bi-person"></i>
+                                {{ form.username.label }}
+                                <span class="required-indicator">*</span>
+                            </label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.username.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            {% if form.username.help_text %}
+                                <div class="help-text">{{ form.username.help_text }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-group">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">
+                                <i class="bi bi-envelope"></i>
+                                {{ form.email.label }}
+                                <span class="required-indicator">*</span>
+                            </label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.email.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            {% if form.email.help_text %}
+                                <div class="help-text">{{ form.email.help_text }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Имя и фамилия в одной строке -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                                        <i class="bi bi-person-badge"></i>
+                                        {{ form.first_name.label }}
+                                    </label>
+                                    {{ form.first_name }}
+                                    {% if form.first_name.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.first_name.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                                        <i class="bi bi-person-badge-fill"></i>
+                                        {{ form.last_name.label }}
+                                    </label>
+                                    {{ form.last_name }}
+                                    {% if form.last_name.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.last_name.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Телефон и страна в одной строке -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.phone_number.id_for_label }}" class="form-label">
+                                        <i class="bi bi-telephone"></i>
+                                        {{ form.phone_number.label }}
+                                    </label>
+                                    {{ form.phone_number }}
+                                    {% if form.phone_number.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.phone_number.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.country.id_for_label }}" class="form-label">
+                                        <i class="bi bi-globe"></i>
+                                        {{ form.country.label }}
+                                    </label>
+                                    {{ form.country }}
+                                    {% if form.country.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.country.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Пароль -->
+                        <div class="form-group">
+                            <label for="{{ form.password1.id_for_label }}" class="form-label">
+                                <i class="bi bi-lock"></i>
+                                {{ form.password1.label }}
+                                <span class="required-indicator">*</span>
+                            </label>
+                            {{ form.password1 }}
+                            {% if form.password1.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.password1.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <!-- Индикатор силы пароля -->
+                            <div class="password-strength">
+                                <small id="password-strength-text" class="text-muted">Введите пароль для проверки надежности</small>
+                                <div class="password-strength-bar">
+                                    <div id="password-strength-fill" class="password-strength-fill"></div>
+                                </div>
+                            </div>
+                            {% if form.password1.help_text %}
+                                <div class="help-text">{{ form.password1.help_text }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Подтверждение пароля -->
+                        <div class="form-group">
+                            <label for="{{ form.password2.id_for_label }}" class="form-label">
+                                <i class="bi bi-lock-fill"></i>
+                                {{ form.password2.label }}
+                                <span class="required-indicator">*</span>
+                            </label>
+                            {{ form.password2 }}
+                            {% if form.password2.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.password2.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            {% if form.password2.help_text %}
+                                <div class="help-text">{{ form.password2.help_text }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Общие ошибки формы -->
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <!-- Кнопка регистрации -->
+                        <button type="submit" class="btn btn-primary btn-register">
+                            <i class="bi bi-person-plus"></i> {{ submit_text }}
+                        </button>
+                    </form>
+
+                    <!-- Ссылка на вход -->
+                    <div class="login-link">
+                        <p class="text-muted mb-0">
+                            Уже есть аккаунт?
+                            <a href="{% url 'users:login' %}" class="text-decoration-none">
+                                Войти в систему
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- JavaScript для улучшения пользовательского опыта -->
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('registrationForm');
+    const password1Field = document.querySelector('input[name="password1"]');
+    const password2Field = document.querySelector('input[name="password2"]');
+    const strengthText = document.getElementById('password-strength-text');
+    const strengthFill = document.getElementById('password-strength-fill');
+
+    // Функция для проверки силы пароля
+    function checkPasswordStrength(password) {
+        let score = 0;
+        let feedback = [];
+
+        // Длина пароля
+        if (password.length >= 8) score += 1;
+        else feedback.push('минимум 8 символов');
+
+        // Содержит цифры
+        if (/\d/.test(password)) score += 1;
+        else feedback.push('содержать цифры');
+
+        // Содержит строчные буквы
+        if (/[a-z]/.test(password)) score += 1;
+        else feedback.push('содержать строчные буквы');
+
+        // Содержит заглавные буквы
+        if (/[A-Z]/.test(password)) score += 1;
+        else feedback.push('содержать заглавные буквы');
+
+        return { score, feedback };
+    }
+
+    // Обновление индикатора силы пароля
+    if (password1Field && strengthText && strengthFill) {
+        password1Field.addEventListener('input', function() {
+            const password = this.value;
+
+            if (password.length === 0) {
+                strengthText.textContent = 'Введите пароль для проверки надежности';
+                strengthFill.className = 'password-strength-fill';
+                return;
+            }
+
+            const { score, feedback } = checkPasswordStrength(password);
+
+            // Удаляем все классы силы
+            strengthFill.className = 'password-strength-fill';
+
+            // Добавляем соответствующий класс
+            if (score <= 1) {
+                strengthFill.classList.add('weak');
+                strengthText.textContent = 'Слабый пароль';
+                strengthText.className = 'text-danger';
+            } else if (score === 2) {
+                strengthFill.classList.add('fair');
+                strengthText.textContent = 'Удовлетворительный пароль';
+                strengthText.className = 'text-warning';
+            } else if (score === 3) {
+                strengthFill.classList.add('good');
+                strengthText.textContent = 'Хороший пароль';
+                strengthText.className = 'text-info';
+            } else {
+                strengthFill.classList.add('strong');
+                strengthText.textContent = 'Надежный пароль';
+                strengthText.className = 'text-success';
+            }
+
+            // Показываем рекомендации для улучшения
+            if (feedback.length > 0 && score < 4) {
+                strengthText.textContent += ` (должен ${feedback.join(', ')})`;
+            }
+        });
+    }
+
+    // Проверка совпадения паролей
+    if (password2Field) {
+        password2Field.addEventListener('input', function() {
+            if (password1Field.value && this.value) {
+                if (password1Field.value !== this.value) {
+                    this.classList.add('is-invalid');
+                    this.classList.remove('is-valid');
+                } else {
+                    this.classList.add('is-valid');
+                    this.classList.remove('is-invalid');
+                }
+            }
+        });
+    }
+
+    // Валидация формы при отправке
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const submitButton = form.querySelector('button[type="submit"]');
+
+            // Показываем индикатор загрузки
+            if (submitButton) {
+                submitButton.innerHTML = '<i class="bi bi-hourglass-split"></i> Создаем аккаунт...';
+                submitButton.disabled = true;
+            }
+
+            // Простая валидация обязательных полей
+            const requiredFields = form.querySelectorAll('[required]');
+            let hasErrors = false;
+
+            requiredFields.forEach(function(field) {
+                if (!field.value.trim()) {
+                    field.classList.add('is-invalid');
+                    hasErrors = true;
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            });
+
+            // Если есть ошибки, останавливаем отправку
+            if (hasErrors) {
+                e.preventDefault();
+                if (submitButton) {
+                    submitButton.innerHTML = '<i class="bi bi-person-plus"></i> {{ submit_text }}';
+                    submitButton.disabled = false;
+                }
+                alert('Пожалуйста, заполните все обязательные поля');
+            }
+        });
+    }
+});
+</script>
+{% endblock %>
