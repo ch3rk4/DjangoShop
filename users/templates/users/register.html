@@ -448,7 +448,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (hasErrors) {
                 e.preventDefault();
                 if (submitButton) {
-                    submitButton.innerHTML = '<i class="bi bi-person-plus"></i> {{ submit_text }}';
+                    submitButton.innerHTML = '<i class="bi bi-person-plus"></i> Зарегистрироваться';
                     submitButton.disabled = false;
                 }
                 alert('Пожалуйста, заполните все обязательные поля');
@@ -457,4 +457,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-{% endblock %>
+{% endblock %}
