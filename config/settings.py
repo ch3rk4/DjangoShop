@@ -68,8 +68,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 AUTH_USER_MODEL = 'users.User'
-
-# Настройки базы данных
 DATABASE_ENGINE = os.getenv('DB_ENGINE', 'django.db.backends.sqlite3')
 
 if DATABASE_ENGINE == 'django.db.backends.postgresql':
