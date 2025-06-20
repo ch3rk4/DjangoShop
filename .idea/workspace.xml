@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="fixes">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="refresh models from catalog" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -102,14 +100,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1748942637193</updated>
-    </task>
-    <task id="LOCAL-00004" summary="refresh files">
-      <option name="closed" value="true" />
-      <created>1748947325348</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1748947325348</updated>
     </task>
     <task id="LOCAL-00005" summary="create models">
       <option name="closed" value="true" />
@@ -495,7 +485,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750333949935</updated>
     </task>
-    <option name="localTasksCounter" value="53" />
+    <task id="LOCAL-00053" summary="refresh models from catalog">
+      <option name="closed" value="true" />
+      <created>1750422354486</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1750422354488</updated>
+    </task>
+    <option name="localTasksCounter" value="54" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -522,7 +520,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="refresh home" />
     <MESSAGE value="create product_detail" />
     <MESSAGE value="create add_product" />
     <MESSAGE value="refresh contacts" />
@@ -547,6 +544,7 @@
     <MESSAGE value="refresh settings" />
     <MESSAGE value="create apps in users" />
     <MESSAGE value="fixes" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixes" />
+    <MESSAGE value="refresh models from catalog" />
+    <option name="LAST_COMMIT_MESSAGE" value="refresh models from catalog" />
   </component>
 </project>
