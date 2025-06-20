@@ -4,7 +4,7 @@ from django.urls import reverse_lazy
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404
 from .models import BlogPost
 
 
@@ -22,27 +22,23 @@ class BlogListView(ListView):
 
     def get_queryset(self):
         """
-        Фильтруем только опубликованные статьи.
-
-        Неопубликованные статьи (черновики) не показываем обычным посетителям.
+        Фильтруем только опубликованные статьи для обычных пользователей.
+        Контент-менеджеры могут видеть все статьи.
         """
-        return BlogPost.objects.filter(is_published=True).order_by('-created_date')
+        queryset = BlogPost.objects.all().order_by('-created_date')
+
+        # Показываем только опубликованные статьи обычным пользователям
+        if not (self.request.user.is_authenticated and
+                self.request.user.groups.filter(name='Контент-менеджер').exists()):
+            queryset = queryset.filter(is_published=True)
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         """Добавляем дополнительную информацию для шаблона."""
         context = super().get_context_data(**kwargs)
         context['page_title'] = 'Блог'
         context['total_posts'] = self.get_queryset().count()
-
-        # Проверяем права пользователя
-        if self.request.user.is_authenticated:
-            context['can_create_post'] = (
-                    self.request.user.groups.filter(name='Контент-менеджер').exists() or
-                    self.request.user.is_superuser
-            )
-        else:
-            context['can_create_post'] = False
-
         return context
 
 
@@ -58,11 +54,17 @@ class BlogDetailView(DetailView):
 
     def get_queryset(self):
         """
-        Показываем только опубликованные статьи.
-
-        Это предотвращает доступ к черновикам через прямую ссылку.
+        Определяем доступные статьи в зависимости от прав пользователя.
         """
-        return BlogPost.objects.filter(is_published=True)
+        queryset = BlogPost.objects.all()
+
+        # Контент-менеджеры могут видеть все статьи
+        if (self.request.user.is_authenticated and
+                self.request.user.groups.filter(name='Контент-менеджер').exists()):
+            return queryset
+
+        # Обычные пользователи видят только опубликованные
+        return queryset.filter(is_published=True)
 
     def get_object(self, queryset=None):
         """
@@ -71,14 +73,15 @@ class BlogDetailView(DetailView):
         # Сначала получаем объект стандартным способом
         obj = super().get_object(queryset)
 
-        # Увеличиваем счетчик просмотров
-        old_views_count = obj.views_count
-        obj.views_count += 1
-        obj.save(update_fields=['views_count'])  # Обновляем только это поле
+        # Увеличиваем счетчик просмотров только для опубликованных статей
+        if obj.is_published:
+            old_views_count = obj.views_count
+            obj.views_count += 1
+            obj.save(update_fields=['views_count'])  # Обновляем только это поле
 
-        # Проверяем, достигли ли ровно 100 просмотров
-        if old_views_count < 100 and obj.views_count >= 100:
-            self.send_congratulation_email(obj)
+            # Проверяем, достигли ли ровно 100 просмотров
+            if old_views_count < 100 and obj.views_count >= 100:
+                self.send_congratulation_email(obj)
 
         return obj
 
@@ -116,51 +119,12 @@ class BlogDetailView(DetailView):
         except Exception as e:
             print(f"❌ Ошибка отправки email: {e}")
 
-    def get_context_data(self, **kwargs):
-        """Добавляем права пользователя в контекст."""
-        context = super().get_context_data(**kwargs)
 
-        # Проверяем права на редактирование и удаление
-        if self.request.user.is_authenticated:
-            context['can_edit_post'] = (
-                    self.request.user.groups.filter(name='Контент-менеджер').exists() or
-                    self.request.user.is_superuser
-            )
-            context['can_delete_post'] = context['can_edit_post']
-        else:
-            context['can_edit_post'] = False
-            context['can_delete_post'] = False
-
-        return context
-
-
-class ContentManagerTestMixin(UserPassesTestMixin):
-    """
-    Миксин для проверки прав контент-менеджера.
-    """
-
-    def test_func(self):
-        """Проверяем, является ли пользователь контент-менеджером."""
-        return (
-                self.request.user.groups.filter(name='Контент-менеджер').exists() or
-                self.request.user.is_superuser
-        )
-
-    def handle_no_permission(self):
-        """Обработка отказа в доступе."""
-        messages.error(
-            self.request,
-            'У вас нет прав для управления блогом. '
-            'Только контент-менеджеры могут выполнять это действие.'
-        )
-        return redirect('blog:blog_list')
-
-
-class BlogCreateView(LoginRequiredMixin, ContentManagerTestMixin, CreateView):
+class BlogCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     """
     Страница создания новой блоговой записи.
 
-    ТРЕБУЕТ АВТОРИЗАЦИИ и прав контент-менеджера.
+    ТРЕБУЕТ АВТОРИЗАЦИИ И ПРАВ - только контент-менеджеры могут создавать статьи.
     """
     model = BlogPost
     template_name = 'blog/blog_form.html'
@@ -169,7 +133,21 @@ class BlogCreateView(LoginRequiredMixin, ContentManagerTestMixin, CreateView):
 
     # Настройки для LoginRequiredMixin
     login_url = '/users/login/'
-    permission_denied_message = 'Для создания статей необходимо войти в систему'
+    permission_denied_message = 'Для создания статей необходимы права контент-менеджера'
+
+    def test_func(self):
+        """Проверяем, является ли пользователь контент-менеджером."""
+        return (self.request.user.is_authenticated and
+                self.request.user.groups.filter(name='Контент-менеджер').exists())
+
+    def handle_no_permission(self):
+        """Обрабатываем отсутствие прав."""
+        messages.error(
+            self.request,
+            'Для создания статей в блоге необходимы права контент-менеджера. '
+            'Обратитесь к администратору для получения доступа.'
+        )
+        return super().handle_no_permission()
 
     def form_valid(self, form):
         """
@@ -177,7 +155,8 @@ class BlogCreateView(LoginRequiredMixin, ContentManagerTestMixin, CreateView):
         """
         messages.success(
             self.request,
-            f'Статья "{form.instance.title}" успешно {'опубликована' if form.instance.is_published else 'сохранена как черновик'}!'
+            f'Статья "{form.instance.title}" успешно '
+            f'{"опубликована" if form.instance.is_published else "сохранена как черновик"}!'
         )
         return super().form_valid(form)
 
@@ -190,16 +169,29 @@ class BlogCreateView(LoginRequiredMixin, ContentManagerTestMixin, CreateView):
         return context
 
 
-class BlogUpdateView(LoginRequiredMixin, ContentManagerTestMixin, UpdateView):
+class BlogUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """
     Страница редактирования существующей блоговой записи.
 
-    ТРЕБУЕТ АВТОРИЗАЦИИ и прав контент-менеджера.
+    ТРЕБУЕТ АВТОРИЗАЦИИ И ПРАВ - только контент-менеджеры могут редактировать статьи.
     """
     model = BlogPost
     template_name = 'blog/blog_form.html'
     fields = ['title', 'content', 'preview_image', 'is_published']
     login_url = '/users/login/'
+
+    def test_func(self):
+        """Проверяем права контент-менеджера."""
+        return (self.request.user.is_authenticated and
+                self.request.user.groups.filter(name='Контент-менеджер').exists())
+
+    def handle_no_permission(self):
+        """Обрабатываем отсутствие прав."""
+        messages.error(
+            self.request,
+            'Для редактирования статей в блоге необходимы права контент-менеджера.'
+        )
+        return super().handle_no_permission()
 
     def get_success_url(self):
         """
@@ -217,16 +209,29 @@ class BlogUpdateView(LoginRequiredMixin, ContentManagerTestMixin, UpdateView):
         return context
 
 
-class BlogDeleteView(LoginRequiredMixin, ContentManagerTestMixin, DeleteView):
+class BlogDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """
     Страница подтверждения удаления блоговой записи.
 
-    ТРЕБУЕТ АВТОРИЗАЦИИ и прав контент-менеджера.
+    ТРЕБУЕТ АВТОРИЗАЦИИ И ПРАВ - только контент-менеджеры могут удалять статьи.
     """
     model = BlogPost
     template_name = 'blog/blog_confirm_delete.html'
     success_url = reverse_lazy('blog:list')
     login_url = '/users/login/'
+
+    def test_func(self):
+        """Проверяем права контент-менеджера."""
+        return (self.request.user.is_authenticated and
+                self.request.user.groups.filter(name='Контент-менеджер').exists())
+
+    def handle_no_permission(self):
+        """Обрабатываем отсутствие прав."""
+        messages.error(
+            self.request,
+            'Для удаления статей в блоге необходимы права контент-менеджера.'
+        )
+        return super().handle_no_permission()
 
     def delete(self, request, *args, **kwargs):
         """Добавляем сообщение об успешном удалении."""
@@ -246,33 +251,31 @@ class BlogDeleteView(LoginRequiredMixin, ContentManagerTestMixin, DeleteView):
 
 
 """
-ОБЪЯСНЕНИЕ БЕЗОПАСНОСТИ БЛОГА С ГРУППАМИ:
+ОБЪЯСНЕНИЕ СИСТЕМЫ ПРАВ ДЛЯ БЛОГА:
 
 1. ОБЩЕДОСТУПНЫЕ страницы:
-   - BlogListView - список опубликованных статей
+   - BlogListView - просмотр опубликованных статей
    - BlogDetailView - чтение опубликованных статей
 
-   Работают как публичная библиотека - читать могут все.
+   Обычные пользователи видят только опубликованные статьи.
 
-2. ЗАЩИЩЕННЫЕ страницы (с ContentManagerTestMixin):
+2. ЗАЩИЩЕННЫЕ страницы (для контент-менеджеров):
    - BlogCreateView - создание новых статей
-   - BlogUpdateView - редактирование статей
+   - BlogUpdateView - редактирование статей  
    - BlogDeleteView - удаление статей
 
-   Доступны только контент-менеджерам и администраторам.
+   Только пользователи из группы "Контент-менеджер" могут управлять блогом.
 
-3. Группа "Контент-менеджер":
-   - Может создавать новые статьи
-   - Может редактировать любые статьи
-   - Может удалять любые статьи
-   - Может управлять публикацией статей
+3. Особенности прав доступа:
+   - UserPassesTestMixin проверяет принадлежность к группе "Контент-менеджер"
+   - Контент-менеджеры видят ВСЕ статьи (включая черновики)
+   - Обычные пользователи видят только опубликованные статьи
+   - При отсутствии прав показывается понятное сообщение об ошибке
 
-4. Обычные пользователи и модераторы продуктов:
-   - НЕ могут создавать статьи
-   - НЕ могут редактировать статьи
-   - НЕ могут удалять статьи
-   - Могут только читать опубликованные статьи
+4. Безопасность:
+   - Модераторы продуктов НЕ могут управлять блогом
+   - Контент-менеджеры НЕ могут модерировать товары
+   - Четкое разделение ответственности между группами
 
-Такая архитектура обеспечивает четкое разделение прав между 
-управлением продуктами и управлением контентом блога.
+Это обеспечивает надежную систему контроля доступа к разным разделам сайта.
 """
