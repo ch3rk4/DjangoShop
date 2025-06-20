@@ -1,19 +1,20 @@
 from django.views.generic import ListView, DetailView, TemplateView, CreateView, UpdateView, DeleteView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
-from .models import Product
-from .forms import ProductForm
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseForbidden
+from .models import Product, Category
+from .forms import ProductForm, ProductModerationForm
 
 
 class HomeView(ListView):
     """
     Главная страница с отображением товаров.
 
-    ОБЩЕДОСТУПНАЯ - любой посетитель может просматривать товары.
-    Это витрина магазина, которую может видеть каждый.
+    ОБЩЕДОСТУПНАЯ - любой посетитель может просматривать опубликованные товары.
     """
     model = Product
     template_name = 'catalog/home.html'
@@ -23,8 +24,13 @@ class HomeView(ListView):
     def get_queryset(self):
         """
         Определяет, какие товары показывать.
+        Показываем только опубликованные товары для обычных пользователей.
         """
-        queryset = Product.objects.select_related('category').all()
+        queryset = Product.objects.select_related('category', 'owner')
+
+        # Показываем только опубликованные товары обычным пользователям
+        if not self.request.user.is_authenticated or not self.request.user.has_perm('catalog.can_moderate_products'):
+            queryset = queryset.filter(publication_status='published')
 
         search_query = self.request.GET.get('search')
         if search_query:
@@ -38,7 +44,7 @@ class HomeView(ListView):
         """
         context = super().get_context_data(**kwargs)
         context['page_title'] = 'Каталог товаров'
-        context['total_products'] = Product.objects.count()
+        context['total_products'] = Product.objects.filter(publication_status='published').count()
 
         # Для совместимости со старыми шаблонами
         context['latest_products_count'] = context['total_products']
@@ -56,12 +62,24 @@ class ProductDetailView(DetailView):
     """
     Страница детального просмотра товара.
 
-    ОБЩЕДОСТУПНАЯ - любой может посмотреть на товар детально.
-    Это как рассматривать товар в магазине - доступно всем.
+    ОБЩЕДОСТУПНАЯ - любой может посмотреть на опубликованные товары.
     """
     model = Product
     template_name = 'catalog/product_detail.html'
     context_object_name = 'product'
+
+    def get_queryset(self):
+        """Определяем доступные товары в зависимости от прав пользователя."""
+        queryset = Product.objects.select_related('category', 'owner')
+
+        # Модераторы и владельцы могут видеть все товары
+        if (self.request.user.is_authenticated and
+                (self.request.user.has_perm('catalog.can_moderate_products') or
+                 queryset.filter(owner=self.request.user).exists())):
+            return queryset
+
+        # Обычные пользователи видят только опубликованные
+        return queryset.filter(publication_status='published')
 
     def get_context_data(self, **kwargs):
         """Добавляем дополнительную информацию о товаре."""
@@ -71,7 +89,10 @@ class ProductDetailView(DetailView):
         # Добавляем связанные товары из той же категории
         context['related_products'] = Product.objects.exclude(
             pk=self.object.pk
-        ).filter(category=self.object.category)[:4]  # 4 похожих товара
+        ).filter(
+            category=self.object.category,
+            publication_status='published'
+        )[:4]  # 4 похожих товара
 
         return context
 
@@ -81,7 +102,6 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
     Страница создания нового товара.
 
     ТРЕБУЕТ АВТОРИЗАЦИИ - только зарегистрированные пользователи могут добавлять товары.
-    LoginRequiredMixin автоматически перенаправляет неавторизованных на страницу входа.
     """
     model = Product
     form_class = ProductForm
@@ -89,22 +109,27 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('catalog:home')
 
     # Настройки для LoginRequiredMixin
-    login_url = '/users/login/'  # Куда перенаправлять неавторизованных
+    login_url = '/users/login/'
     permission_denied_message = 'Для добавления товаров необходимо войти в систему'
+
+    def get_form_kwargs(self):
+        """Передаем пользователя в форму."""
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
     def form_valid(self, form):
         """
         Вызывается при успешной валидации формы.
-
-        Можно добавить связь товара с пользователем, который его создал.
+        Автоматически устанавливаем владельца товара.
         """
-        # Если в модели Product есть поле author/creator, можно добавить:
-        # form.instance.created_by = self.request.user
+        # Устанавливаем владельца товара
+        form.instance.owner = self.request.user
 
         messages.success(
             self.request,
             f'Товар "{form.instance.name}" успешно добавлен! '
-            f'Спасибо за вклад в развитие каталога.'
+            f'Статус: {form.instance.get_publication_status_display()}'
         )
         return super().form_valid(form)
 
@@ -113,6 +138,142 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         context['page_title'] = 'Добавить товар'
         context['submit_text'] = 'Добавить товар'
+        return context
+
+
+class ProductUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """
+    Контроллер редактирования товара.
+
+    ТРЕБУЕТ АВТОРИЗАЦИИ и проверки прав - только владелец или модератор может редактировать.
+    """
+    model = Product
+    form_class = ProductForm
+    template_name = 'catalog/product_form.html'
+    login_url = '/users/login/'
+
+    def test_func(self):
+        """Проверяем, может ли пользователь редактировать товар."""
+        product = self.get_object()
+        return product.can_be_edited_by(self.request.user)
+
+    def get_form_kwargs(self):
+        """Передаем пользователя в форму."""
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def get_success_url(self):
+        """Перенаправляем на страницу товара после редактирования."""
+        return reverse_lazy('catalog:product_detail', kwargs={'pk': self.object.pk})
+
+    def form_valid(self, form):
+        """Показываем сообщение об успешном обновлении."""
+        messages.success(
+            self.request,
+            f'Товар "{form.instance.name}" успешно обновлен!'
+        )
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = f'Редактирование: {self.object.name}'
+        context['submit_text'] = 'Сохранить изменения'
+        context['form_action'] = 'update'
+        return context
+
+
+class ProductDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """
+    Контроллер удаления товара.
+
+    ТРЕБУЕТ АВТОРИЗАЦИИ и проверки прав - только владелец или модератор продуктов может удалять.
+    """
+    model = Product
+    template_name = 'catalog/product_confirm_delete.html'
+    success_url = reverse_lazy('catalog:home')
+    login_url = '/users/login/'
+
+    def test_func(self):
+        """Проверяем, может ли пользователь удалить товар."""
+        product = self.get_object()
+        return product.can_be_deleted_by(self.request.user)
+
+    def delete(self, request, *args, **kwargs):
+        """Показываем сообщение об успешном удалении."""
+        product_name = self.get_object().name
+        response = super().delete(request, *args, **kwargs)
+        messages.success(
+            request,
+            f'Товар "{product_name}" успешно удален из каталога.'
+        )
+        return response
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = f'Удаление товара: {self.object.name}'
+        return context
+
+
+class ProductUnpublishView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """
+    Контроллер для снятия товара с публикации.
+
+    Доступен только модераторам с соответствующими правами.
+    """
+    model = Product
+    form_class = ProductModerationForm
+    template_name = 'catalog/product_unpublish.html'
+    login_url = '/users/login/'
+
+    def test_func(self):
+        """Проверяем права на снятие с публикации."""
+        return self.request.user.has_perm('catalog.can_unpublish_product')
+
+    def form_valid(self, form):
+        """Обрабатываем успешное изменение статуса."""
+        old_status = self.object.publication_status
+        new_status = form.cleaned_data['publication_status']
+
+        response = super().form_valid(form)
+
+        messages.success(
+            self.request,
+            f'Статус товара "{self.object.name}" изменен с '
+            f'"{self.object.get_publication_status_display()}" на "{dict(Product.PUBLICATION_STATUS_CHOICES)[new_status]}"'
+        )
+
+        return response
+
+    def get_success_url(self):
+        return reverse_lazy('catalog:product_detail', kwargs={'pk': self.object.pk})
+
+
+class CategoryProductsView(ListView):
+    """
+    Страница товаров определенной категории.
+    """
+    model = Product
+    template_name = 'catalog/category_products.html'
+    context_object_name = 'products'
+    paginate_by = 12
+
+    def get_queryset(self):
+        """Получаем товары определенной категории."""
+        self.category = get_object_or_404(Category, pk=self.kwargs['category_id'])
+
+        queryset = Product.objects.filter(category=self.category).select_related('owner')
+
+        # Показываем только опубликованные товары для обычных пользователей
+        if not self.request.user.is_authenticated or not self.request.user.has_perm('catalog.can_moderate_products'):
+            queryset = queryset.filter(publication_status='published')
+
+        return queryset.order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category'] = self.category
+        context['page_title'] = f'Товары в категории: {self.category.name}'
         return context
 
 
@@ -207,95 +368,3 @@ Email: {email}
 
         # Перенаправляем на ту же страницу, чтобы избежать повторной отправки
         return self.get(request, *args, **kwargs)
-
-
-# БУДУЩИЕ КОНТРОЛЛЕРЫ (для расширения функциональности)
-
-class ProductUpdateView(LoginRequiredMixin, UpdateView):
-    """
-    Контроллер редактирования товара.
-
-    ТРЕБУЕТ АВТОРИЗАЦИИ - только авторизованные пользователи могут редактировать товары.
-    В будущем можно добавить проверку, что пользователь может редактировать только свои товары.
-    """
-    model = Product
-    form_class = ProductForm
-    template_name = 'catalog/product_form.html'
-    login_url = '/users/login/'
-
-    def get_success_url(self):
-        """Перенаправляем на страницу товара после редактирования."""
-        return reverse_lazy('catalog:product_detail', kwargs={'pk': self.object.pk})
-
-    def form_valid(self, form):
-        """Показываем сообщение об успешном обновлении."""
-        messages.success(
-            self.request,
-            f'Товар "{form.instance.name}" успешно обновлен!'
-        )
-        return super().form_valid(form)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['page_title'] = f'Редактирование: {self.object.name}'
-        context['submit_text'] = 'Сохранить изменения'
-        return context
-
-
-class ProductDeleteView(LoginRequiredMixin, DeleteView):
-    """
-    Контроллер удаления товара.
-
-    ТРЕБУЕТ АВТОРИЗАЦИИ - только авторизованные пользователи могут удалять товары.
-    """
-    model = Product
-    template_name = 'catalog/product_confirm_delete.html'
-    success_url = reverse_lazy('catalog:home')
-    login_url = '/users/login/'
-
-    def delete(self, request, *args, **kwargs):
-        """Показываем сообщение об успешном удалении."""
-        product_name = self.get_object().name
-        response = super().delete(request, *args, **kwargs)
-        messages.success(
-            request,
-            f'Товар "{product_name}" успешно удален из каталога.'
-        )
-        return response
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['page_title'] = f'Удаление товара: {self.object.name}'
-        return context
-
-
-"""
-ОБЪЯСНЕНИЕ БЕЗОПАСНОСТИ:
-
-1. ОБЩЕДОСТУПНЫЕ страницы (без LoginRequiredMixin):
-   - HomeView - просмотр каталога товаров
-   - ProductDetailView - детальный просмотр товара
-   - ContactView - страница контактов
-
-   Эти страницы работают как витрина магазина - смотреть может каждый.
-
-2. ЗАЩИЩЕННЫЕ страницы (с LoginRequiredMixin):
-   - ProductCreateView - создание товара
-   - ProductUpdateView - редактирование товара (для будущего)
-   - ProductDeleteView - удаление товара (для будущего)
-
-   Эти страницы работают как служебные помещения - доступ только для сотрудников.
-
-3. LoginRequiredMixin автоматически:
-   - Проверяет авторизацию пользователя
-   - Перенаправляет на страницу входа если не авторизован
-   - Сохраняет URL для возврата после входа (параметр ?next=)
-   - Показывает сообщение об ошибке доступа
-
-4. Настройки безопасности:
-   - login_url - куда перенаправлять неавторизованных
-   - permission_denied_message - сообщение об ошибке доступа
-
-Это обеспечивает правильную модель безопасности:
-"Смотреть могут все, изменять - только авторизованные пользователи"
-"""
