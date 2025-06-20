@@ -13,6 +13,7 @@ class ProductForm(forms.ModelForm):
     - Валидацию цены (не может быть отрицательной)
     - Валидацию загружаемых изображений (формат и размер)
     - Красивую стилизацию полей через Bootstrap
+    - Возможность изменения статуса публикации (для модераторов)
     """
 
     # Константы с запрещенными словами для переиспользования
@@ -29,7 +30,7 @@ class ProductForm(forms.ModelForm):
 
     class Meta:
         model = Product
-        fields = ['name', 'description', 'category', 'price', 'image']
+        fields = ['name', 'description', 'category', 'price', 'image', 'publication_status']
 
         # Переопределяем подписи для полей
         labels = {
@@ -37,7 +38,8 @@ class ProductForm(forms.ModelForm):
             'description': 'Описание товара',
             'category': 'Категория',
             'price': 'Цена (руб.)',
-            'image': 'Изображение товара'
+            'image': 'Изображение товара',
+            'publication_status': 'Статус публикации'
         }
 
         # Добавляем текст помощи для полей
@@ -46,16 +48,17 @@ class ProductForm(forms.ModelForm):
             'description': 'Подробное описание товара, его характеристики и преимущества',
             'category': 'Выберите подходящую категорию для товара',
             'price': 'Цена товара в рублях (должна быть положительным числом)',
-            'image': 'Загрузите изображение товара (форматы: JPG, PNG, размер до 5 МБ)'
+            'image': 'Загрузите изображение товара (форматы: JPG, PNG, размер до 5 МБ)',
+            'publication_status': 'Статус публикации товара'
         }
 
     def __init__(self, *args, **kwargs):
         """
         Инициализация формы с применением стилизации Bootstrap.
-
-        Этот метод вызывается при создании экземпляра формы
-        и позволяет нам настроить внешний вид полей.
         """
+        # Получаем пользователя из kwargs
+        self.user = kwargs.pop('user', None)
+
         super().__init__(*args, **kwargs)
 
         # Применяем стили Bootstrap ко всем полям с явными ID
@@ -91,6 +94,24 @@ class ProductForm(forms.ModelForm):
             'accept': 'image/jpeg,image/jpg,image/png',
             'id': 'product-image-field'
         })
+
+        # Настройка поля статуса публикации
+        self.fields['publication_status'].widget.attrs.update({
+            'class': 'form-select',
+            'id': 'product-status-field'
+        })
+
+        # Ограничиваем выбор статуса в зависимости от прав пользователя
+        if self.user:
+            if not self.user.has_perm('catalog.can_moderate_products'):
+                # Обычные пользователи могут выбирать только между черновиком и отправкой на модерацию
+                self.fields['publication_status'].choices = [
+                    ('draft', 'Черновик'),
+                    ('pending', 'На модерации'),
+                ]
+                # По умолчанию ставим черновик для новых товаров
+                if not self.instance.pk:
+                    self.fields['publication_status'].initial = 'draft'
 
         # Проверяем, есть ли категории в базе данных
         if not Category.objects.exists():
@@ -269,6 +290,20 @@ class ProductForm(forms.ModelForm):
 
         return image
 
+    def clean_publication_status(self):
+        """Валидация статуса публикации."""
+        status = self.cleaned_data.get('publication_status')
+
+        # Если пользователь не модератор, проверяем ограничения
+        if self.user and not self.user.has_perm('catalog.can_moderate_products'):
+            allowed_statuses = ['draft', 'pending']
+            if status not in allowed_statuses:
+                raise ValidationError(
+                    'Вы можете выбрать только "Черновик" или "На модерации".'
+                )
+
+        return status
+
     def clean(self):
         """
         Общая валидация формы.
@@ -298,3 +333,20 @@ class ProductForm(forms.ModelForm):
                 )
 
         return cleaned_data
+
+
+class ProductModerationForm(forms.ModelForm):
+    """
+    Форма для модерации товаров (только для модераторов).
+    """
+
+    class Meta:
+        model = Product
+        fields = ['publication_status']
+        widgets = {
+            'publication_status': forms.Select(attrs={'class': 'form-select'})
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['publication_status'].label = 'Изменить статус на:'

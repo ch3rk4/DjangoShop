@@ -100,6 +100,26 @@
                                         {{ product.category.name }}
                                     </p>
 
+                                    <!-- Статус публикации -->
+                                    {% if product.publication_status != 'published' %}
+                                        <div class="mb-2">
+                                            {% if product.publication_status == 'draft' %}
+                                                <span class="badge bg-secondary">Черновик</span>
+                                            {% elif product.publication_status == 'moderation' %}
+                                                <span class="badge bg-warning">На модерации</span>
+                                            {% elif product.publication_status == 'rejected' %}
+                                                <span class="badge bg-danger">Отклонено</span>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+
+                                    <!-- Информация о владельце для модераторов -->
+                                    {% if user.is_authenticated and perms.catalog.can_moderate_product %}
+                                        <div class="small text-muted mb-2">
+                                            <i class="bi bi-person"></i> {{ product.owner.get_full_name|default:product.owner.username }}
+                                        </div>
+                                    {% endif %}
+
                                     <!-- Нижняя часть карточки (цена и кнопки) -->
                                     <div class="mt-auto">
                                         <!-- Цена товара -->
@@ -115,6 +135,35 @@
                                                class="btn btn-primary flex-grow-1">
                                                 <i class="bi bi-eye"></i> Подробнее
                                             </a>
+
+                                            <!-- Кнопки для владельца или модератора -->
+                                            {% if user.is_authenticated %}
+                                                {% if product.owner == user or perms.catalog.can_moderate_product %}
+                                                    <a href="{% url 'catalog:product_edit' product.pk %}"
+                                                       class="btn btn-outline-secondary btn-sm"
+                                                       title="Редактировать">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                {% endif %}
+
+                                                {% if product.owner == user or perms.catalog.delete_product %}
+                                                    <a href="{% url 'catalog:product_delete' product.pk %}"
+                                                       class="btn btn-outline-danger btn-sm"
+                                                       title="Удалить"
+                                                       onclick="return confirm('Вы уверены, что хотите удалить этот товар?')">
+                                                        <i class="bi bi-trash"></i>
+                                                    </a>
+                                                {% endif %}
+
+                                                <!-- Кнопка модерации для модераторов -->
+                                                {% if perms.catalog.can_change_product_status %}
+                                                    <a href="{% url 'catalog:product_moderate' product.pk %}"
+                                                       class="btn btn-outline-info btn-sm"
+                                                       title="Модерировать">
+                                                        <i class="bi bi-shield-check"></i>
+                                                    </a>
+                                                {% endif %}
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>

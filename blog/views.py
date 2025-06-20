@@ -1,9 +1,10 @@
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
+from django.shortcuts import redirect
 from .models import BlogPost
 
 
@@ -32,6 +33,16 @@ class BlogListView(ListView):
         context = super().get_context_data(**kwargs)
         context['page_title'] = 'Блог'
         context['total_posts'] = self.get_queryset().count()
+
+        # Проверяем права пользователя
+        if self.request.user.is_authenticated:
+            context['can_create_post'] = (
+                    self.request.user.groups.filter(name='Контент-менеджер').exists() or
+                    self.request.user.is_superuser
+            )
+        else:
+            context['can_create_post'] = False
+
         return context
 
 
@@ -105,13 +116,51 @@ class BlogDetailView(DetailView):
         except Exception as e:
             print(f"❌ Ошибка отправки email: {e}")
 
+    def get_context_data(self, **kwargs):
+        """Добавляем права пользователя в контекст."""
+        context = super().get_context_data(**kwargs)
 
-class BlogCreateView(LoginRequiredMixin, CreateView):
+        # Проверяем права на редактирование и удаление
+        if self.request.user.is_authenticated:
+            context['can_edit_post'] = (
+                    self.request.user.groups.filter(name='Контент-менеджер').exists() or
+                    self.request.user.is_superuser
+            )
+            context['can_delete_post'] = context['can_edit_post']
+        else:
+            context['can_edit_post'] = False
+            context['can_delete_post'] = False
+
+        return context
+
+
+class ContentManagerTestMixin(UserPassesTestMixin):
+    """
+    Миксин для проверки прав контент-менеджера.
+    """
+
+    def test_func(self):
+        """Проверяем, является ли пользователь контент-менеджером."""
+        return (
+                self.request.user.groups.filter(name='Контент-менеджер').exists() or
+                self.request.user.is_superuser
+        )
+
+    def handle_no_permission(self):
+        """Обработка отказа в доступе."""
+        messages.error(
+            self.request,
+            'У вас нет прав для управления блогом. '
+            'Только контент-менеджеры могут выполнять это действие.'
+        )
+        return redirect('blog:blog_list')
+
+
+class BlogCreateView(LoginRequiredMixin, ContentManagerTestMixin, CreateView):
     """
     Страница создания новой блоговой записи.
 
-    ТРЕБУЕТ АВТОРИЗАЦИИ - только зарегистрированные пользователи могут создавать статьи.
-    LoginRequiredMixin автоматически перенаправляет неавторизованных на страницу входа.
+    ТРЕБУЕТ АВТОРИЗАЦИИ и прав контент-менеджера.
     """
     model = BlogPost
     template_name = 'blog/blog_form.html'
@@ -125,12 +174,7 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         """
         Вызывается при успешной валидации формы.
-
-        Можно добавить связь статьи с автором, если в модели есть соответствующее поле.
         """
-        # Если в модели BlogPost есть поле author, можно добавить:
-        # form.instance.author = self.request.user
-
         messages.success(
             self.request,
             f'Статья "{form.instance.title}" успешно {'опубликована' if form.instance.is_published else 'сохранена как черновик'}!'
@@ -146,11 +190,11 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
         return context
 
 
-class BlogUpdateView(LoginRequiredMixin, UpdateView):
+class BlogUpdateView(LoginRequiredMixin, ContentManagerTestMixin, UpdateView):
     """
     Страница редактирования существующей блоговой записи.
 
-    ТРЕБУЕТ АВТОРИЗАЦИИ - только авторизованные пользователи могут редактировать статьи.
+    ТРЕБУЕТ АВТОРИЗАЦИИ и прав контент-менеджера.
     """
     model = BlogPost
     template_name = 'blog/blog_form.html'
@@ -173,11 +217,11 @@ class BlogUpdateView(LoginRequiredMixin, UpdateView):
         return context
 
 
-class BlogDeleteView(LoginRequiredMixin, DeleteView):
+class BlogDeleteView(LoginRequiredMixin, ContentManagerTestMixin, DeleteView):
     """
     Страница подтверждения удаления блоговой записи.
 
-    ТРЕБУЕТ АВТОРИЗАЦИИ - только авторизованные пользователи могут удалять статьи.
+    ТРЕБУЕТ АВТОРИЗАЦИИ и прав контент-менеджера.
     """
     model = BlogPost
     template_name = 'blog/blog_confirm_delete.html'
@@ -202,7 +246,7 @@ class BlogDeleteView(LoginRequiredMixin, DeleteView):
 
 
 """
-ОБЪЯСНЕНИЕ БЕЗОПАСНОСТИ БЛОГА:
+ОБЪЯСНЕНИЕ БЕЗОПАСНОСТИ БЛОГА С ГРУППАМИ:
 
 1. ОБЩЕДОСТУПНЫЕ страницы:
    - BlogListView - список опубликованных статей
@@ -210,25 +254,25 @@ class BlogDeleteView(LoginRequiredMixin, DeleteView):
 
    Работают как публичная библиотека - читать могут все.
 
-2. ЗАЩИЩЕННЫЕ страницы (с LoginRequiredMixin):
+2. ЗАЩИЩЕННЫЕ страницы (с ContentManagerTestMixin):
    - BlogCreateView - создание новых статей
    - BlogUpdateView - редактирование статей
    - BlogDeleteView - удаление статей
 
-   Работают как редакционный отдел - только для авторизованных "журналистов".
+   Доступны только контент-менеджерам и администраторам.
 
-3. Дополнительная безопасность:
-   - Показываем только опубликованные статьи (is_published=True)
-   - Черновики не доступны через прямые ссылки
-   - Счетчик просмотров работает для всех посетителей
-   - Поздравительные письма при достижении 100 просмотров
+3. Группа "Контент-менеджер":
+   - Может создавать новые статьи
+   - Может редактировать любые статьи
+   - Может удалять любые статьи
+   - Может управлять публикацией статей
 
-4. Будущие улучшения:
-   - Можно добавить поле author в BlogPost модель
-   - Разрешить редактирование только своих статей
-   - Добавить модерацию статей перед публикацией
-   - Система тегов и категорий для статей
+4. Обычные пользователи и модераторы продуктов:
+   - НЕ могут создавать статьи
+   - НЕ могут редактировать статьи
+   - НЕ могут удалять статьи
+   - Могут только читать опубликованные статьи
 
-Такая архитектура обеспечивает баланс между открытостью контента 
-и контролем за его созданием.
+Такая архитектура обеспечивает четкое разделение прав между 
+управлением продуктами и управлением контентом блога.
 """

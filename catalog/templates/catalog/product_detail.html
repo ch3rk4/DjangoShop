@@ -52,13 +52,43 @@
         display: inline-block;
         margin-bottom: 1rem;
     }
+
+    /* Стили для статуса публикации */
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .status-draft { background-color: #6c757d; color: white; }
+    .status-pending { background-color: #ffc107; color: #212529; }
+    .status-published { background-color: #28a745; color: white; }
+    .status-unpublished { background-color: #dc3545; color: white; }
+
+    /* Стили для информации о владельце */
+    .owner-info {
+        background: #e3f2fd;
+        border-left: 4px solid #2196f3;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-radius: 0.25rem;
+    }
+
+    /* Стили для панели модерации */
+    .moderation-panel {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
 </style>
 {% endblock %}
 
 <!-- Основной контент страницы товара -->
 {% block content %}
     <!-- Навигационные крошки для удобства навигации -->
-    <!-- Breadcrumb показывает пользователю где он находится в структуре сайта -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
@@ -67,13 +97,24 @@
                 </a>
             </li>
             <li class="breadcrumb-item">
-                <span class="text-muted">{{ product.category.name }}</span>
+                <a href="{% url 'catalog:category_products' product.category.pk %}">
+                    {{ product.category.name }}
+                </a>
             </li>
             <li class="breadcrumb-item active" aria-current="page">
                 {{ product.name }}
             </li>
         </ol>
     </nav>
+
+    <!-- Предупреждение о статусе для неопубликованных товаров -->
+    {% if product.publication_status != 'published' %}
+        <div class="alert alert-warning mb-4">
+            <i class="bi bi-exclamation-triangle"></i>
+            <strong>Внимание:</strong>
+            Этот товар имеет статус "{{ product.get_publication_status_display }}" и не виден обычным посетителям.
+        </div>
+    {% endif %}
 
     <!-- Основной контент товара -->
     <div class="row">
@@ -115,7 +156,17 @@
             <div class="product-info">
                 <!-- Категория товара -->
                 <div class="product-category">
-                    <i class="bi bi-tag"></i> {{ product.category.name }}
+                    <i class="bi bi-tag"></i>
+                    <a href="{% url 'catalog:category_products' product.category.pk %}" class="text-decoration-none">
+                        {{ product.category.name }}
+                    </a>
+                </div>
+
+                <!-- Статус публикации -->
+                <div class="mb-3">
+                    <span class="status-badge status-{{ product.publication_status }}">
+                        {{ product.get_publication_status_display }}
+                    </span>
                 </div>
 
                 <!-- Название товара -->
@@ -124,6 +175,17 @@
                 <!-- Цена товара -->
                 <div class="product-price mb-4">
                     {{ product.price }} ₽
+                </div>
+
+                <!-- Информация о владельце -->
+                <div class="owner-info">
+                    <h6><i class="bi bi-person"></i> Информация о товаре</h6>
+                    <p class="mb-1">
+                        <strong>Владелец:</strong> {{ product.owner.get_full_name|default:product.owner.username }}
+                    </p>
+                    <p class="mb-0">
+                        <strong>ID товара:</strong> #{{ product.id }}
+                    </p>
                 </div>
 
                 <!-- Описание товара -->
@@ -140,36 +202,95 @@
                 </div>
 
                 <!-- Кнопки действий -->
-                <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-start mb-4">
                     <!-- Кнопка "Купить" (пока заглушка) -->
-                    <button type="button" class="btn btn-success btn-lg me-md-2" disabled>
-                        <i class="bi bi-cart-plus"></i> Купить
-                        <small class="d-block">Скоро будет доступно</small>
-                    </button>
+                    {% if product.publication_status == 'published' %}
+                        <button type="button" class="btn btn-success btn-lg me-md-2" disabled>
+                            <i class="bi bi-cart-plus"></i> Купить
+                            <small class="d-block">Скоро будет доступно</small>
+                        </button>
+                    {% endif %}
 
                     <!-- Кнопка "В избранное" (пока заглушка) -->
                     <button type="button" class="btn btn-outline-secondary btn-lg" disabled>
                         <i class="bi bi-heart"></i> В избранное
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <!-- Дополнительная информация -->
-                <div class="mt-4 pt-4 border-top">
-                    <h4 class="h6 mb-3">Дополнительная информация</h4>
-                    <div class="row g-3">
-                        <div class="col-sm-6">
-                            <strong>ID товара:</strong><br>
-                            <span class="text-muted">#{{ product.id }}</span>
-                        </div>
-                        <div class="col-sm-6">
-                            <strong>Категория:</strong><br>
-                            <span class="text-muted">{{ product.category.name }}</span>
+    <!-- Панель управления товаром (только для владельца и модераторов) -->
+    {% if user.is_authenticated %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-gear"></i> Управление товаром
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Действия владельца -->
+                            {% if product.can_be_edited_by:user %}
+                                <div class="col-md-6">
+                                    <h6>Действия владельца:</h6>
+                                    <div class="d-flex flex-wrap gap-2 mb-3">
+                                        <a href="{% url 'catalog:product_update' product.pk %}"
+                                           class="btn btn-primary btn-sm">
+                                            <i class="bi bi-pencil"></i> Редактировать
+                                        </a>
+
+                                        {% if product.can_be_deleted_by:user %}
+                                            <a href="{% url 'catalog:product_delete' product.pk %}"
+                                               class="btn btn-danger btn-sm"
+                                               onclick="return confirm('Вы уверены, что хотите удалить этот товар?')">
+                                                <i class="bi bi-trash"></i> Удалить
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <!-- Действия модератора -->
+                            {% if user.has_perm:'catalog.can_moderate_products' or user.has_perm:'catalog.can_unpublish_product' %}
+                                <div class="col-md-6">
+                                    <h6>Действия модератора:</h6>
+                                    <div class="d-flex flex-wrap gap-2 mb-3">
+                                        {% if user.has_perm:'catalog.can_unpublish_product' %}
+                                            <a href="{% url 'catalog:product_unpublish' product.pk %}"
+                                               class="btn btn-warning btn-sm">
+                                                <i class="bi bi-eye-slash"></i> Изменить статус
+                                            </a>
+                                        {% endif %}
+
+                                        {% if user.groups.all|length > 0 and 'Модератор продуктов' in user.groups.all|join:', ' %}
+                                            <a href="{% url 'catalog:product_delete' product.pk %}"
+                                               class="btn btn-outline-danger btn-sm"
+                                               onclick="return confirm('Модератор удаляет товар. Вы уверены?')">
+                                                <i class="bi bi-shield-x"></i> Удалить как модератор
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <!-- Если нет прав -->
+                            {% if not product.can_be_edited_by:user and not user.has_perm:'catalog.can_moderate_products' %}
+                                <div class="col-12">
+                                    <p class="text-muted mb-0">
+                                        <i class="bi bi-info-circle"></i>
+                                        У вас нет прав для управления этим товаром.
+                                    </p>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    {% endif %}
 
     <!-- Навигационные кнопки внизу страницы -->
     <div class="row mt-5">
@@ -188,20 +309,45 @@
         </div>
     </div>
 
-    <!-- Блок с похожими товарами (пока заглушка для будущего развития) -->
-    <div class="row mt-5">
-        <div class="col-12">
-            <h3 class="mb-3">
-                <i class="bi bi-grid"></i> Другие товары из категории "{{ product.category.name }}"
-            </h3>
+    <!-- Блок с похожими товарами -->
+    {% if related_products %}
+        <div class="row mt-5">
+            <div class="col-12">
+                <h3 class="mb-3">
+                    <i class="bi bi-grid"></i> Другие товары из категории "{{ product.category.name }}"
+                </h3>
 
-            <!-- Здесь в будущем можно добавить карусель с похожими товарами -->
-            <div class="alert alert-info">
-                <i class="bi bi-lightbulb"></i>
-                <strong>Планируется в следующих версиях:</strong>
-                Здесь будут показаны другие товары из той же категории для удобства выбора.
+                <div class="row">
+                    {% for related_product in related_products %}
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card h-100">
+                                {% if related_product.image %}
+                                    <img src="{{ related_product.image.url }}"
+                                         class="card-img-top"
+                                         alt="{{ related_product.name }}"
+                                         style="height: 200px; object-fit: cover;">
+                                {% else %}
+                                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                                         style="height: 200px;">
+                                        <i class="bi bi-image fs-1 text-muted"></i>
+                                    </div>
+                                {% endif %}
+
+                                <div class="card-body d-flex flex-column">
+                                    <h6 class="card-title">{{ related_product.name }}</h6>
+                                    <p class="card-text text-success fw-bold">{{ related_product.price }} ₽</p>
+                                    <div class="mt-auto">
+                                        <a href="{{ related_product.get_absolute_url }}"
+                                           class="btn btn-primary btn-sm">
+                                            Подробнее
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
-    </div>
+    {% endif %}
 {% endblock %}
-

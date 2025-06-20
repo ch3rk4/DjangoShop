@@ -2,7 +2,6 @@ from django.db import models
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
-# Получаем модель пользователя
 User = get_user_model()
 
 
@@ -52,7 +51,7 @@ class Category(models.Model):
         """
         Возвращает URL для детального просмотра категории.
         """
-        return reverse('catalog:index')
+        return reverse('catalog:category_products', kwargs={'category_id': self.pk})
 
 
 class Product(models.Model):
@@ -60,14 +59,15 @@ class Product(models.Model):
     Модель товара.
 
     Содержит всю основную информацию о товаре: название, описание, цену,
-    изображение и связь с категорией.
+    изображение, связь с категорией, владельца и статус публикации.
     """
-    # Статусы публикации товара
-    STATUS_CHOICES = [
+
+    # Статусы публикации
+    PUBLICATION_STATUS_CHOICES = [
         ('draft', 'Черновик'),
-        ('moderation', 'На модерации'),
-        ('published', 'Опубликовано'),
-        ('rejected', 'Отклонено'),
+        ('pending', 'На модерации'),
+        ('published', 'Опубликован'),
+        ('unpublished', 'Снят с публикации'),
     ]
 
     name = models.CharField(
@@ -106,24 +106,22 @@ class Product(models.Model):
         help_text='Цена в рублях'
     )
 
-    # НОВОЕ: Статус публикации
-    publication_status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default='draft',
-        verbose_name='Статус публикации',
-        help_text='Текущий статус товара в системе'
-    )
-
     # НОВОЕ: Владелец товара
     owner = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='products',
         verbose_name='Владелец',
-        help_text='Пользователь, создавший товар',
-        null=True,  # Временно для миграции
-        blank=True
+        help_text='Пользователь, создавший товар'
+    )
+
+    # НОВОЕ: Статус публикации
+    publication_status = models.CharField(
+        max_length=20,
+        choices=PUBLICATION_STATUS_CHOICES,
+        default='draft',
+        verbose_name='Статус публикации',
+        help_text='Текущий статус публикации товара'
     )
 
     created_at = models.DateTimeField(
@@ -141,11 +139,10 @@ class Product(models.Model):
         verbose_name_plural = 'Товары'
         ordering = ['-created_at']  # Новые товары сначала
 
-        # НОВОЕ: Кастомные права
+        # НОВОЕ: Кастомные права доступа
         permissions = [
-            ('can_unpublish_product', 'Может отменять публикацию товара'),
-            ('can_moderate_product', 'Может модерировать товары'),
-            ('can_change_product_status', 'Может изменять статус товара'),
+            ('can_unpublish_product', 'Может снимать товары с публикации'),
+            ('can_moderate_products', 'Может модерировать товары'),
         ]
 
     def __str__(self):
@@ -178,28 +175,46 @@ class Product(models.Model):
         """Проверяет, может ли пользователь редактировать товар."""
         if not user.is_authenticated:
             return False
+
         # Владелец может редактировать
         if self.owner == user:
             return True
-        # Модератор может редактировать
-        if user.has_perm('catalog.can_moderate_product'):
+
+        # Модераторы могут редактировать
+        if user.has_perm('catalog.can_moderate_products'):
             return True
-        # Администратор может редактировать
-        if user.is_superuser:
-            return True
+
         return False
 
     def can_be_deleted_by(self, user):
         """Проверяет, может ли пользователь удалить товар."""
         if not user.is_authenticated:
             return False
-        # Владелец может удалять
+
+        # Владелец может удалить
         if self.owner == user:
             return True
-        # Модератор может удалять
-        if user.has_perm('catalog.delete_product'):
+
+        # Модераторы продуктов могут удалить
+        if user.groups.filter(name='Модератор продуктов').exists():
             return True
-        # Администратор может удалять
-        if user.is_superuser:
-            return True
+
         return False
+
+    def can_be_unpublished_by(self, user):
+        """Проверяет, может ли пользователь снять товар с публикации."""
+        if not user.is_authenticated:
+            return False
+
+        # Проверяем специальное право
+        return user.has_perm('catalog.can_unpublish_product')
+
+    def get_status_display_class(self):
+        """Возвращает CSS класс для отображения статуса."""
+        status_classes = {
+            'draft': 'text-muted',
+            'pending': 'text-warning',
+            'published': 'text-success',
+            'unpublished': 'text-danger',
+        }
+        return status_classes.get(self.publication_status, 'text-muted')
