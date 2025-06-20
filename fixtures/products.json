@@ -7,6 +7,8 @@
       "description": "Новейший смартфон Apple с инновационными технологиями и улучшенной камерой. Идеальное сочетание производительности и стиля.",
       "category": 1,
       "price": "99999.00",
+      "owner": 1,
+      "publication_status": "published",
       "created_at": "2024-01-15T11:00:00Z",
       "updated_at": "2024-01-15T11:00:00Z"
     }
@@ -19,6 +21,8 @@
       "description": "Удобные джинсы из качественного денима. Классический крой подойдет для любого случая.",
       "category": 2,
       "price": "3500.00",
+      "owner": 1,
+      "publication_status": "published",
       "created_at": "2024-01-15T11:15:00Z",
       "updated_at": "2024-01-15T11:15:00Z"
     }
@@ -31,6 +35,8 @@
       "description": "Отличная книга для изучения языка программирования Python с нуля. Множество практических примеров и упражнений.",
       "category": 3,
       "price": "1200.00",
+      "owner": 1,
+      "publication_status": "published",
       "created_at": "2024-01-15T11:30:00Z",
       "updated_at": "2024-01-15T11:30:00Z"
     }
@@ -43,6 +49,8 @@
       "description": "Легкий и мощный ноутбук от Apple. Процессор M2 обеспечивает невероятную производительность при минимальном энергопотреблении.",
       "category": 1,
       "price": "89999.00",
+      "owner": 1,
+      "publication_status": "published",
       "created_at": "2024-01-15T12:00:00Z",
       "updated_at": "2024-01-15T12:00:00Z"
     }
@@ -55,8 +63,24 @@
       "description": "Теплое и стильное худи для холодного времени года. Выполнено из мягкого хлопка с утеплителем.",
       "category": 2,
       "price": "2800.00",
+      "owner": 1,
+      "publication_status": "published",
       "created_at": "2024-01-15T12:15:00Z",
       "updated_at": "2024-01-15T12:15:00Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 6,
+    "fields": {
+      "name": "Ноутбук Gaming Pro",
+      "description": "Мощный игровой ноутбук для требовательных игр и задач. Находится на модерации.",
+      "category": 1,
+      "price": "125000.00",
+      "owner": 1,
+      "publication_status": "pending",
+      "created_at": "2024-01-15T12:30:00Z",
+      "updated_at": "2024-01-15T12:30:00Z"
     }
   }
 ]

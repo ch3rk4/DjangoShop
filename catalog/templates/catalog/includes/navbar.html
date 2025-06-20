@@ -45,193 +45,6 @@
                 </li>
                 {% endif %}
 
-                <!-- Контакты -->
-                <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'contacts' %}active{% endif %}"
-                       href="{% url 'catalog:contacts' %}">
-                        <i class="bi bi-envelope"></i> Контакты
-                    </a>
-                </li>
-            </ul>
-
-            <!-- Правая часть меню - пользователь -->
-            <ul class="navbar-nav">
-                {% if user.is_authenticated %}
-                    <!-- Для авторизованных пользователей -->
-
-                    <!-- Dropdown меню пользователя -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center"
-                           href="#"
-                           id="userDropdown"
-                           role="button"
-                           data-bs-toggle="dropdown"
-                           aria-expanded="false">
-                            <!-- Аватар пользователя -->
-                            {% if user.avatar %}
-                                <img src="{{ user.avatar.url }}"
-                                     alt="Аватар {{ user.get_full_name|default:user.username }}"
-                                     class="rounded-circle me-2"
-                                     width="28"
-                                     height="28"
-                                     style="object-fit: cover;">
-                            {% else %}
-                                <i class="bi bi-person-circle me-2" style="font-size: 1.5rem;"></i>
-                            {% endif %}
-
-                            <!-- Имя пользователя -->
-                            <span>{{ user.get_full_name|default:user.username }}</span>
-                        </a>
-
-                        <!-- Выпадающее меню -->
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <!-- Информация о пользователе -->
-                            <li>
-                                <h6 class="dropdown-header">
-                                    <i class="bi bi-person-badge"></i>
-                                    {{ user.get_full_name|default:user.username }}
-                                </h6>
-                            </li>
-                            <li>
-                                <span class="dropdown-item-text small text-muted">
-                                    {{ user.email }}
-                                </span>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-
-                            <!-- Ссылка на профиль -->
-                            <li>
-                                <a class="dropdown-item" href="{% url 'users:profile' %}">
-                                    <i class="bi bi-person"></i> Мой профиль
-                                </a>
-                            </li>
-
-                            <!-- Разделитель -->
-                            <li><hr class="dropdown-divider"></li>
-
-                            <!-- Выход из системы -->
-                            <li>
-                                <a class="dropdown-item text-danger"
-                                   href="{% url 'users:logout' %}"
-                                   onclick="return confirm('Вы уверены, что хотите выйти из системы?')">
-                                    <i class="bi bi-box-arrow-right"></i> Выйти
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                {% else %}
-                    <!-- Для неавторизованных пользователей -->
-
-                    <!-- Кнопка входа -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'users:login' %}">
-                            <i class="bi bi-box-arrow-in-right"></i> Вход
-                        </a>
-                    </li>
-
-                    <!-- Кнопка регистрации -->
-                    <li class="nav-item">
-                        <a class="nav-link btn btn-outline-light ms-2 px-3"
-                           href="{% url 'users:register' %}"
-                           style="border-radius: 20px;">
-                            <i class="bi bi-person-plus"></i> Регистрация
-                        </a>
-                    </li>
-                {% endif %}
-            </ul>
-        </div>
-    </div>
-</nav>
-
-<!-- Дополнительные стили для улучшения навигации -->
-<style>
-/* Стили для активных ссылок */
-.navbar-nav .nav-link.active {
-    color: #fff !important;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 0.375rem;
-}
-
-/* Стили для dropdown меню */
-.dropdown-menu {
-    border: none;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border-radius: 0.5rem;
-    margin-top: 0.5rem;
-}
-
-.dropdown-item:hover {
-    background-color: #f8f9fa;
-}
-
-.dropdown-item.text-danger:hover {
-    background-color: #f8d7da;
-}
-
-/* Анимация для аватара */
-.navbar-nav .dropdown-toggle img {
-    transition: transform 0.2s ease;
-}
-
-.navbar-nav .dropdown-toggle:hover img {
-    transform: scale(1.1);
-}
-
-/* Стили для кнопки регистрации */
-.navbar-nav .btn-outline-light:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.5);
-}
-
-/* Responsive стили для мобильных устройств */
-@media (max-width: 991.98px) {
-    .navbar-nav .bt<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-        <!-- Логотип/название сайта -->
-        <a class="navbar-brand" href="{% url 'catalog:home' %}">
-            <i class="bi bi-shop"></i> Django Shop
-        </a>
-
-        <!-- Кнопка для мобильного меню (гамбургер) -->
-        <button class="navbar-toggler" type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#navbarNav"
-                aria-controls="navbarNav"
-                aria-expanded="false"
-                aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <!-- Само меню -->
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <!-- Левая часть меню - основная навигация -->
-            <ul class="navbar-nav me-auto">
-                <!-- Главная страница -->
-                <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
-                       href="{% url 'catalog:home' %}">
-                        <i class="bi bi-house"></i> Главная
-                    </a>
-                </li>
-
-                <!-- Блог -->
-                <li class="nav-item">
-                    <a class="nav-link {% if 'blog' in request.resolver_match.namespace %}active{% endif %}"
-                       href="{% url 'blog:blog_list' %}">
-                        <i class="bi bi-journal-text"></i> Блог
-                    </a>
-                </li>
-
-                <!-- Добавить товар - только для авторизованных пользователей -->
-                {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'add_product' %}active{% endif %}"
-                       href="{% url 'catalog:add_product' %}">
-                        <i class="bi bi-plus-circle"></i> Добавить товар
-                    </a>
-                </li>
-                {% endif %}
-
                 <!-- Создать статью - только для контент-менеджеров -->
                 {% if user.is_authenticated and user.groups.all %}
                     {% for group in user.groups.all %}
@@ -344,6 +157,7 @@
 
                             <!-- Административные функции для модераторов -->
                             {% if user.groups.all %}
+                                <!-- Проверяем, есть ли у пользователя админские группы -->
                                 {% for group in user.groups.all %}
                                     {% if group.name == 'Модератор продуктов' or group.name == 'Контент-менеджер' %}
                                         <li><hr class="dropdown-divider"></li>
@@ -352,6 +166,8 @@
                                                 <i class="bi bi-gear"></i> Управление
                                             </h6>
                                         </li>
+
+                                        <!-- Модерация товаров -->
                                         {% if group.name == 'Модератор продуктов' %}
                                             <li>
                                                 <a class="dropdown-item" href="/admin/catalog/product/">
@@ -359,6 +175,8 @@
                                                 </a>
                                             </li>
                                         {% endif %}
+
+                                        <!-- Управление блогом -->
                                         {% if group.name == 'Контент-менеджер' %}
                                             <li>
                                                 <a class="dropdown-item" href="/admin/blog/blogpost/">
@@ -366,7 +184,6 @@
                                                 </a>
                                             </li>
                                         {% endif %}
-                                        {% break %}
                                     {% endif %}
                                 {% endfor %}
                             {% endif %}
@@ -464,15 +281,6 @@
     .dropdown-menu {
         margin-top: 0;
         min-width: 200px;
-    }
-}
-</style>n-outline-light {
-        margin-top: 0.5rem;
-        margin-left: 0 !important;
-    }
-
-    .dropdown-menu {
-        margin-top: 0;
     }
 }
 </style>
