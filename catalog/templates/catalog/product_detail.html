@@ -254,7 +254,7 @@
                             {% endif %}
 
                             <!-- Действия модератора -->
-                            {% if user.has_perm:'catalog.can_moderate_products' or can_unpublish_product %}
+                            {% if perms.catalog.can_moderate_products or can_unpublish_product %}
                                 <div class="col-md-6">
                                     <h6>Действия модератора:</h6>
                                     <div class="d-flex flex-wrap gap-2 mb-3">
@@ -277,7 +277,7 @@
                             {% endif %}
 
                             <!-- Если нет прав -->
-                            {% if not can_edit_product and not user.has_perm:'catalog.can_moderate_products' %}
+                            {% if not can_edit_product and not perms.catalog.can_moderate_products %}
                                 <div class="col-12">
                                     <p class="text-muted mb-0">
                                         <i class="bi bi-info-circle"></i>

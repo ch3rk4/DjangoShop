@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="refresh env.template">
+    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="fixes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/catalog/templates/catalog/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/catalog/templates/catalog/home.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/catalog/templates/catalog/popular_produts.html" beforeDir="false" afterPath="$PROJECT_DIR$/catalog/templates/catalog/popular_products.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/catalog/templates/catalog/product_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/catalog/templates/catalog/product_detail.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/catalog/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/catalog/views.py" afterDir="false" />
     </list>
@@ -27,7 +25,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="HW8" />
+        <entry key="$PROJECT_DIR$" value="HW8.1" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -58,7 +56,7 @@
     "DefaultHtmlFileTemplate": "HTML File",
     "Python.test_crud.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "HW8.1"
+    "git-widget-placeholder": "HW8.2"
   }
 }]]></component>
   <component name="RunManager">
@@ -107,14 +105,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1748942637193</updated>
-    </task>
-    <task id="LOCAL-00017" summary="create forms">
-      <option name="closed" value="true" />
-      <created>1749032376767</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1749032376767</updated>
     </task>
     <task id="LOCAL-00018" summary="refresh urls">
       <option name="closed" value="true" />
@@ -500,7 +490,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750517762840</updated>
     </task>
-    <option name="localTasksCounter" value="66" />
+    <task id="LOCAL-00066" summary="fixes">
+      <option name="closed" value="true" />
+      <created>1750519357381</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1750519357383</updated>
+    </task>
+    <option name="localTasksCounter" value="67" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -539,7 +537,6 @@
     <MESSAGE value="create admin in users" />
     <MESSAGE value="refresh settings" />
     <MESSAGE value="create apps in users" />
-    <MESSAGE value="fixes" />
     <MESSAGE value="refresh models from catalog" />
     <MESSAGE value="reworks all homework" />
     <MESSAGE value="create fixture groups" />
@@ -552,6 +549,7 @@
     <MESSAGE value="refresh navbar" />
     <MESSAGE value="create manage_cache" />
     <MESSAGE value="refresh env.template" />
-    <option name="LAST_COMMIT_MESSAGE" value="refresh env.template" />
+    <MESSAGE value="fixes" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixes" />
   </component>
 </project>
