@@ -6,14 +6,30 @@ from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseForbidden
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
+from django.core.cache import cache
+from django.conf import settings
+import logging
+
 from .models import Product, Category
 from .forms import ProductForm, ProductModerationForm
+from .services import (
+    get_products_by_category,
+    get_cached_product_list,
+    get_popular_products,
+    search_products,
+    invalidate_products_cache,
+    get_category_stats
+)
+
+# Настройка логирования для кеширования
+logger = logging.getLogger('cache')
 
 
 class HomeView(ListView):
     """
     Главная страница с отображением товаров.
-
     ОБЩЕДОСТУПНАЯ - любой посетитель может просматривать опубликованные товары.
     """
     model = Product
@@ -23,20 +39,23 @@ class HomeView(ListView):
 
     def get_queryset(self):
         """
-        Определяет, какие товары показывать.
-        Показываем только опубликованные товары для обычных пользователей.
+        Определяет, какие товары показывать с использованием кеширования.
         """
-        queryset = Product.objects.select_related('category', 'owner')
-
-        # Показываем только опубликованные товары обычным пользователям
-        if not self.request.user.is_authenticated or not self.request.user.has_perm('catalog.can_moderate_products'):
-            queryset = queryset.filter(publication_status='published')
-
         search_query = self.request.GET.get('search')
-        if search_query:
-            queryset = queryset.filter(name__icontains=search_query)
 
-        return queryset
+        if search_query:
+            # Используем сервисную функцию для поиска
+            return search_products(search_query, self.request.user)
+
+        # Используем сервисную функцию для получения списка товаров
+        filters = {}
+        cache_key_suffix = "home"
+
+        return get_cached_product_list(
+            filters=filters,
+            user=self.request.user,
+            cache_key_suffix=cache_key_suffix
+        )
 
     def get_context_data(self, **kwargs):
         """
@@ -44,25 +63,42 @@ class HomeView(ListView):
         """
         context = super().get_context_data(**kwargs)
         context['page_title'] = 'Каталог товаров'
-        context['total_products'] = Product.objects.filter(publication_status='published').count()
 
-        # Для совместимости со старыми шаблонами
-        context['latest_products_count'] = context['total_products']
+        # Кешируем общую статистику
+        stats_cache_key = "home_stats"
+
+        if getattr(settings, 'CACHE_ENABLED', True):
+            cached_stats = cache.get(stats_cache_key)
+            if cached_stats:
+                context.update(cached_stats)
+                logger.info("Получена статистика главной страницы из кеша")
+            else:
+                stats = {
+                    'total_products': Product.objects.filter(publication_status='published').count(),
+                    'latest_products_count': context.get('total_products', 0),
+                }
+                cache.set(stats_cache_key, stats, 300)  # 5 минут
+                context.update(stats)
+                logger.info("Статистика главной страницы закеширована")
+        else:
+            context['total_products'] = Product.objects.filter(publication_status='published').count()
+            context['latest_products_count'] = context['total_products']
 
         # Добавляем информацию о поиске
         search_query = self.request.GET.get('search')
         if search_query:
             context['search_query'] = search_query
-            context['search_results_count'] = context['products'].count()
+            context['search_results_count'] = len(context['products'])
 
         return context
 
 
+@method_decorator(cache_page(900), name='dispatch')  # 15 минут кеширования
 class ProductDetailView(DetailView):
     """
     Страница детального просмотра товара.
-
     ОБЩЕДОСТУПНАЯ - любой может посмотреть на опубликованные товары.
+    Кешируется на 15 минут.
     """
     model = Product
     template_name = 'catalog/product_detail.html'
@@ -86,21 +122,36 @@ class ProductDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['page_title'] = f'Товар: {self.object.name}'
 
-        # Добавляем связанные товары из той же категории
-        context['related_products'] = Product.objects.exclude(
-            pk=self.object.pk
-        ).filter(
-            category=self.object.category,
-            publication_status='published'
-        )[:4]  # 4 похожих товара
+        # Кешируем связанные товары
+        related_cache_key = f"related_products_{self.object.category.pk}_{self.object.pk}"
 
+        if getattr(settings, 'CACHE_ENABLED', True):
+            related_products = cache.get(related_cache_key)
+            if related_products is None:
+                related_products = list(Product.objects.exclude(
+                    pk=self.object.pk
+                ).filter(
+                    category=self.object.category,
+                    publication_status='published'
+                ).select_related('category', 'owner')[:4])
+
+                cache.set(related_cache_key, related_products, 600)  # 10 минут
+                logger.info(f"Кешированы связанные товары для продукта {self.object.pk}")
+        else:
+            related_products = Product.objects.exclude(
+                pk=self.object.pk
+            ).filter(
+                category=self.object.category,
+                publication_status='published'
+            )[:4]
+
+        context['related_products'] = related_products
         return context
 
 
 class ProductCreateView(LoginRequiredMixin, CreateView):
     """
     Страница создания нового товара.
-
     ТРЕБУЕТ АВТОРИЗАЦИИ - только зарегистрированные пользователи могут добавлять товары.
     """
     model = Product
@@ -126,12 +177,17 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
         # Устанавливаем владельца товара
         form.instance.owner = self.request.user
 
+        response = super().form_valid(form)
+
+        # Инвалидируем кеш товаров после создания
+        invalidate_products_cache(form.instance.category.pk)
+
         messages.success(
             self.request,
             f'Товар "{form.instance.name}" успешно добавлен! '
             f'Статус: {form.instance.get_publication_status_display()}'
         )
-        return super().form_valid(form)
+        return response
 
     def get_context_data(self, **kwargs):
         """Добавляем заголовок страницы."""
@@ -144,7 +200,6 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
 class ProductUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """
     Контроллер редактирования товара.
-
     ТРЕБУЕТ АВТОРИЗАЦИИ и проверки прав - только владелец или модератор может редактировать.
     """
     model = Product
@@ -169,11 +224,16 @@ class ProductUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def form_valid(self, form):
         """Показываем сообщение об успешном обновлении."""
+        response = super().form_valid(form)
+
+        # Инвалидируем кеш товаров после обновления
+        invalidate_products_cache(form.instance.category.pk)
+
         messages.success(
             self.request,
             f'Товар "{form.instance.name}" успешно обновлен!'
         )
-        return super().form_valid(form)
+        return response
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -186,7 +246,6 @@ class ProductUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 class ProductDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """
     Контроллер удаления товара.
-
     ТРЕБУЕТ АВТОРИЗАЦИИ и проверки прав - только владелец или модератор продуктов может удалять.
     """
     model = Product
@@ -201,8 +260,15 @@ class ProductDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def delete(self, request, *args, **kwargs):
         """Показываем сообщение об успешном удалении."""
-        product_name = self.get_object().name
+        product = self.get_object()
+        product_name = product.name
+        category_id = product.category.pk
+
         response = super().delete(request, *args, **kwargs)
+
+        # Инвалидируем кеш товаров после удаления
+        invalidate_products_cache(category_id)
+
         messages.success(
             request,
             f'Товар "{product_name}" успешно удален из каталога.'
@@ -218,7 +284,6 @@ class ProductDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 class ProductUnpublishView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """
     Контроллер для снятия товара с публикации.
-
     Доступен только модераторам с соответствующими правами.
     """
     model = Product
@@ -233,14 +298,16 @@ class ProductUnpublishView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def form_valid(self, form):
         """Обрабатываем успешное изменение статуса."""
         old_status = self.object.publication_status
+        response = super().form_valid(form)
         new_status = form.cleaned_data['publication_status']
 
-        response = super().form_valid(form)
+        # Инвалидируем кеш товаров после изменения статуса
+        invalidate_products_cache(self.object.category.pk)
 
         messages.success(
             self.request,
             f'Статус товара "{self.object.name}" изменен с '
-            f'"{self.object.get_publication_status_display()}" на "{dict(Product.PUBLICATION_STATUS_CHOICES)[new_status]}"'
+            f'"{dict(Product.PUBLICATION_STATUS_CHOICES)[old_status]}" на "{dict(Product.PUBLICATION_STATUS_CHOICES)[new_status]}"'
         )
 
         return response
@@ -251,7 +318,7 @@ class ProductUnpublishView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 class CategoryProductsView(ListView):
     """
-    Страница товаров определенной категории.
+    Страница товаров определенной категории с использованием сервисной функции.
     """
     model = Product
     template_name = 'catalog/category_products.html'
@@ -259,28 +326,55 @@ class CategoryProductsView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        """Получаем товары определенной категории."""
+        """Получаем товары определенной категории через сервисную функцию."""
         self.category = get_object_or_404(Category, pk=self.kwargs['category_id'])
 
-        queryset = Product.objects.filter(category=self.category).select_related('owner')
-
-        # Показываем только опубликованные товары для обычных пользователей
-        if not self.request.user.is_authenticated or not self.request.user.has_perm('catalog.can_moderate_products'):
-            queryset = queryset.filter(publication_status='published')
-
-        return queryset.order_by('-created_at')
+        return get_products_by_category(
+            category_id=self.category.pk,
+            user=self.request.user,
+            include_unpublished=False
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['category'] = self.category
         context['page_title'] = f'Товары в категории: {self.category.name}'
+
+        # Добавляем статистику категории
+        context['category_stats'] = get_category_stats(self.category.pk)
+
+        return context
+
+
+class PopularProductsView(ListView):
+    """
+    НОВОЕ: Страница популярных товаров.
+    """
+    template_name = 'catalog/popular_products.html'
+    context_object_name = 'products'
+    paginate_by = 20
+
+    def get_queryset(self):
+        """Получаем популярные товары через сервисную функцию."""
+        limit = self.request.GET.get('limit', 20)
+        try:
+            limit = int(limit)
+            if limit > 100:  # Ограничиваем максимум
+                limit = 100
+        except (ValueError, TypeError):
+            limit = 20
+
+        return get_popular_products(limit=limit)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = 'Популярные товары'
         return context
 
 
 class ContactView(TemplateView):
     """
     Страница контактов.
-
     ОБЩЕДОСТУПНАЯ - любой может посмотреть контактную информацию.
     """
     template_name = 'catalog/contacts.html'
@@ -301,7 +395,6 @@ class ContactView(TemplateView):
     def post(self, request, *args, **kwargs):
         """
         Обработка отправки формы обратной связи.
-
         ОБЩЕДОСТУПНАЯ - любой может отправить сообщение.
         """
         # Получаем данные из формы
