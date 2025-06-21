@@ -45,17 +45,24 @@ class HomeView(ListView):
 
         if search_query:
             # Используем сервисную функцию для поиска
-            return search_products(search_query, self.request.user)
+            products = search_products(search_query, self.request.user)
+        else:
+            # Используем сервисную функцию для получения списка товаров
+            filters = {}
+            cache_key_suffix = "home"
+            products = get_cached_product_list(
+                filters=filters,
+                user=self.request.user,
+                cache_key_suffix=cache_key_suffix
+            )
 
-        # Используем сервисную функцию для получения списка товаров
-        filters = {}
-        cache_key_suffix = "home"
+        # ИСПРАВЛЕНИЕ: Добавляем информацию о правах для каждого товара
+        for product in products:
+            product._can_edit = product.can_be_edited_by(self.request.user)
+            product._can_delete = product.can_be_deleted_by(self.request.user)
+            product._can_unpublish = product.can_be_unpublished_by(self.request.user)
 
-        return get_cached_product_list(
-            filters=filters,
-            user=self.request.user,
-            cache_key_suffix=cache_key_suffix
-        )
+        return products
 
     def get_context_data(self, **kwargs):
         """
@@ -121,6 +128,11 @@ class ProductDetailView(DetailView):
         """Добавляем дополнительную информацию о товаре."""
         context = super().get_context_data(**kwargs)
         context['page_title'] = f'Товар: {self.object.name}'
+
+        # ИСПРАВЛЕНИЕ: Добавляем информацию о правах пользователя
+        context['can_edit_product'] = self.object.can_be_edited_by(self.request.user)
+        context['can_delete_product'] = self.object.can_be_deleted_by(self.request.user)
+        context['can_unpublish_product'] = self.object.can_be_unpublished_by(self.request.user)
 
         # Кешируем связанные товары
         related_cache_key = f"related_products_{self.object.category.pk}_{self.object.pk}"
@@ -329,11 +341,19 @@ class CategoryProductsView(ListView):
         """Получаем товары определенной категории через сервисную функцию."""
         self.category = get_object_or_404(Category, pk=self.kwargs['category_id'])
 
-        return get_products_by_category(
+        products = get_products_by_category(
             category_id=self.category.pk,
             user=self.request.user,
             include_unpublished=False
         )
+
+        # ИСПРАВЛЕНИЕ: Добавляем информацию о правах для каждого товара
+        for product in products:
+            product._can_edit = product.can_be_edited_by(self.request.user)
+            product._can_delete = product.can_be_deleted_by(self.request.user)
+            product._can_unpublish = product.can_be_unpublished_by(self.request.user)
+
+        return products
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
