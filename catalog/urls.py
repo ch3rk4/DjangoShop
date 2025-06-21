@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     HomeView, ProductDetailView, ContactView, ProductCreateView,
     ProductUpdateView, ProductDeleteView, ProductUnpublishView,
-    CategoryProductsView
+    CategoryProductsView, PopularProductsView
 )
 
 # Пространство имен приложения для избежания конфликтов URL
@@ -12,7 +12,7 @@ urlpatterns = [
     # Главная страница каталога
     path('', HomeView.as_view(), name='home'),
 
-    # Детальная страница товара
+    # Детальная страница товара (с кешированием)
     # <int:pk> означает, что ожидаем целое число (ID товара)
     path('product/<int:pk>/', ProductDetailView.as_view(), name='product_detail'),
 
@@ -33,6 +33,9 @@ urlpatterns = [
     # Снятие товара с публикации (для модераторов)
     path('product/<int:pk>/unpublish/', ProductUnpublishView.as_view(), name='product_unpublish'),
 
-    # Товары по категориям
+    # Товары по категориям (с использованием сервисной функции)
     path('category/<int:category_id>/', CategoryProductsView.as_view(), name='category_products'),
+
+    # НОВОЕ: Популярные товары
+    path('popular/', PopularProductsView.as_view(), name='popular_products'),
 ]
