@@ -1,6 +1,6 @@
 """
 Django settings for config project.
-Исправленная версия с правильными настройками для пользователей.
+Версия с Redis кешированием.
 """
 
 import os
@@ -93,6 +93,37 @@ else:
         }
     }
 
+# НОВОЕ: Настройки кеширования с Redis
+CACHE_ENABLED = os.getenv('CACHE_ENABLED', 'True').lower() == 'true'
+
+if CACHE_ENABLED:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/1'),
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                'COMPRESSOR': 'django_redis.compressors.zlib.ZlibCompressor',
+                'IGNORE_EXCEPTIONS': True,  # Продолжаем работу даже если Redis недоступен
+            },
+            'TIMEOUT': 300,  # Время жизни кеша по умолчанию (5 минут)
+            'KEY_PREFIX': 'djangoshop',  # Префикс для ключей кеша
+            'VERSION': 1,
+        }
+    }
+
+    # Настройки для сессий через Redis (опционально)
+    SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+    SESSION_CACHE_ALIAS = 'default'
+else:
+    # Если кеширование отключено, используем локальную память
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake',
+        }
+    }
+
 # Валидаторы паролей для безопасности
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -144,6 +175,14 @@ EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.Em
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@djangoshop.com')
 ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'admin@djangoshop.com')
 
+# НОВОЕ: Настройки кеширования для конкретных целей
+CACHE_TTL = {
+    'products': 300,  # 5 минут для списка товаров
+    'product_detail': 900,  # 15 минут для страницы товара
+    'categories': 3600,  # 1 час для категорий (редко меняются)
+    'user_products': 60,  # 1 минута для товаров пользователя
+}
+
 if not DEBUG:
     # Используйте HTTPS в продакшене
     SECURE_SSL_REDIRECT = True
@@ -154,3 +193,27 @@ if not DEBUG:
     # Защита сессий
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
+# Логирование для отладки кеширования
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'cache.log',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'cache': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
