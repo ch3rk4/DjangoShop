@@ -220,7 +220,7 @@
         </div>
     </div>
 
-    <!-- Панель управления товаром (только для владельца и модераторов) -->
+<!-- Панель управления товаром (только для владельца и модераторов) -->
     {% if user.is_authenticated %}
         <div class="row mt-4">
             <div class="col-12">
@@ -233,7 +233,7 @@
                     <div class="card-body">
                         <div class="row">
                             <!-- Действия владельца -->
-                            {% if product.can_be_edited_by:user %}
+                            {% if can_edit_product %}
                                 <div class="col-md-6">
                                     <h6>Действия владельца:</h6>
                                     <div class="d-flex flex-wrap gap-2 mb-3">
@@ -242,7 +242,7 @@
                                             <i class="bi bi-pencil"></i> Редактировать
                                         </a>
 
-                                        {% if product.can_be_deleted_by:user %}
+                                        {% if can_delete_product %}
                                             <a href="{% url 'catalog:product_delete' product.pk %}"
                                                class="btn btn-danger btn-sm"
                                                onclick="return confirm('Вы уверены, что хотите удалить этот товар?')">
@@ -254,11 +254,11 @@
                             {% endif %}
 
                             <!-- Действия модератора -->
-                            {% if user.has_perm:'catalog.can_moderate_products' or user.has_perm:'catalog.can_unpublish_product' %}
+                            {% if user.has_perm:'catalog.can_moderate_products' or can_unpublish_product %}
                                 <div class="col-md-6">
                                     <h6>Действия модератора:</h6>
                                     <div class="d-flex flex-wrap gap-2 mb-3">
-                                        {% if user.has_perm:'catalog.can_unpublish_product' %}
+                                        {% if can_unpublish_product %}
                                             <a href="{% url 'catalog:product_unpublish' product.pk %}"
                                                class="btn btn-warning btn-sm">
                                                 <i class="bi bi-eye-slash"></i> Изменить статус
@@ -277,7 +277,7 @@
                             {% endif %}
 
                             <!-- Если нет прав -->
-                            {% if not product.can_be_edited_by:user and not user.has_perm:'catalog.can_moderate_products' %}
+                            {% if not can_edit_product and not user.has_perm:'catalog.can_moderate_products' %}
                                 <div class="col-12">
                                     <p class="text-muted mb-0">
                                         <i class="bi bi-info-circle"></i>

@@ -136,12 +136,14 @@
                                     </a>
 
                                     <!-- Кнопки для владельца -->
-                                    {% if user.is_authenticated and product.can_be_edited_by:user %}
-                                        <a href="{% url 'catalog:product_update' product.pk %}"
-                                           class="btn btn-outline-secondary btn-sm"
-                                           title="Редактировать">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
+                                    {% if user.is_authenticated %}
+                                        {% if product.owner == user or perms.catalog.can_moderate_products %}
+                                            <a href="{% url 'catalog:product_update' product.pk %}"
+                                               class="btn btn-outline-secondary btn-sm"
+                                               title="Редактировать">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                        {% endif %}
                                     {% endif %}
                                 </div>
                             </div>

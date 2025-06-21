@@ -4,7 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="create manage_cache" />
+    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="refresh env.template">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/catalog/templates/catalog/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/catalog/templates/catalog/home.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/catalog/templates/catalog/popular_produts.html" beforeDir="false" afterPath="$PROJECT_DIR$/catalog/templates/catalog/popular_products.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/catalog/templates/catalog/product_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/catalog/templates/catalog/product_detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/catalog/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/catalog/views.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -21,7 +27,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="HW7.1" />
+        <entry key="$PROJECT_DIR$" value="HW8" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -52,7 +58,7 @@
     "DefaultHtmlFileTemplate": "HTML File",
     "Python.test_crud.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "HW8"
+    "git-widget-placeholder": "HW8.1"
   }
 }]]></component>
   <component name="RunManager">
@@ -101,14 +107,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1748942637193</updated>
-    </task>
-    <task id="LOCAL-00016" summary="refresh views">
-      <option name="closed" value="true" />
-      <created>1749032324822</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1749032324822</updated>
     </task>
     <task id="LOCAL-00017" summary="create forms">
       <option name="closed" value="true" />
@@ -494,7 +492,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750517694537</updated>
     </task>
-    <option name="localTasksCounter" value="65" />
+    <task id="LOCAL-00065" summary="refresh env.template">
+      <option name="closed" value="true" />
+      <created>1750517762840</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1750517762840</updated>
+    </task>
+    <option name="localTasksCounter" value="66" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -521,7 +527,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="refresh forms" />
     <MESSAGE value="refresh views" />
     <MESSAGE value="refresh urls" />
     <MESSAGE value="fix forms and create product_form, product_confirm; refresh base" />
@@ -546,6 +551,7 @@
     <MESSAGE value="create popular_products'mask" />
     <MESSAGE value="refresh navbar" />
     <MESSAGE value="create manage_cache" />
-    <option name="LAST_COMMIT_MESSAGE" value="create manage_cache" />
+    <MESSAGE value="refresh env.template" />
+    <option name="LAST_COMMIT_MESSAGE" value="refresh env.template" />
   </component>
 </project>

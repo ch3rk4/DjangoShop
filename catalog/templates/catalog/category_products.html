@@ -112,7 +112,6 @@
                                     </strong>
                                 </p>
 
-                                <!-- Кнопки действий -->
                                 <div class="d-flex gap-2">
                                     <a href="{% url 'catalog:product_detail' product.pk %}"
                                        class="btn btn-primary flex-grow-1">
@@ -120,7 +119,7 @@
                                     </a>
 
                                     <!-- Кнопки для владельца -->
-                                    {% if user.is_authenticated and product.can_be_edited_by:user %}
+                                    {% if user.is_authenticated and product._can_edit %}
                                         <a href="{% url 'catalog:product_update' product.pk %}"
                                            class="btn btn-outline-secondary btn-sm"
                                            title="Редактировать">
