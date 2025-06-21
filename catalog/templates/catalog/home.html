@@ -105,16 +105,16 @@
                                         <div class="mb-2">
                                             {% if product.publication_status == 'draft' %}
                                                 <span class="badge bg-secondary">Черновик</span>
-                                            {% elif product.publication_status == 'moderation' %}
+                                            {% elif product.publication_status == 'pending' %}
                                                 <span class="badge bg-warning">На модерации</span>
-                                            {% elif product.publication_status == 'rejected' %}
-                                                <span class="badge bg-danger">Отклонено</span>
+                                            {% elif product.publication_status == 'unpublished' %}
+                                                <span class="badge bg-danger">Снят с публикации</span>
                                             {% endif %}
                                         </div>
                                     {% endif %}
 
                                     <!-- Информация о владельце для модераторов -->
-                                    {% if user.is_authenticated and perms.catalog.can_moderate_product %}
+                                    {% if user.is_authenticated and perms.catalog.can_moderate_products %}
                                         <div class="small text-muted mb-2">
                                             <i class="bi bi-person"></i> {{ product.owner.get_full_name|default:product.owner.username }}
                                         </div>
@@ -138,8 +138,8 @@
 
                                             <!-- Кнопки для владельца или модератора -->
                                             {% if user.is_authenticated %}
-                                                {% if product.owner == user or perms.catalog.can_moderate_product %}
-                                                    <a href="{% url 'catalog:product_edit' product.pk %}"
+                                                {% if product.owner == user or perms.catalog.can_moderate_products %}
+                                                    <a href="{% url 'catalog:product_update' product.pk %}"
                                                        class="btn btn-outline-secondary btn-sm"
                                                        title="Редактировать">
                                                         <i class="bi bi-pencil"></i>
@@ -156,8 +156,8 @@
                                                 {% endif %}
 
                                                 <!-- Кнопка модерации для модераторов -->
-                                                {% if perms.catalog.can_change_product_status %}
-                                                    <a href="{% url 'catalog:product_moderate' product.pk %}"
+                                                {% if perms.catalog.can_unpublish_product %}
+                                                    <a href="{% url 'catalog:product_unpublish' product.pk %}"
                                                        class="btn btn-outline-info btn-sm"
                                                        title="Модерировать">
                                                         <i class="bi bi-shield-check"></i>

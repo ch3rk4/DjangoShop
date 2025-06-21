@@ -30,9 +30,9 @@ class ProductAdmin(admin.ModelAdmin):
     """
     Настройка отображения модели Product в админке.
     """
-    list_display = ('id', 'name', 'price', 'category', 'owner', 'status_badge', 'created_at')
+    # ИСПРАВЛЕНО: Добавляем publication_status в list_display
+    list_display = ('id', 'name', 'price', 'category', 'owner', 'publication_status', 'status_badge', 'created_at')
     list_display_links = ('id', 'name')
-    list_filter = ('category', 'publication_status', 'owner', 'created_at', 'updated_at')
     search_fields = ('name', 'description', 'owner__username', 'owner__email')
     list_select_related = ('category', 'owner')  # Оптимизация запросов
     readonly_fields = ('created_at', 'updated_at')
@@ -87,7 +87,7 @@ class ProductAdmin(admin.ModelAdmin):
             status_text
         )
 
-    status_badge.short_description = 'Статус'
+    status_badge.short_description = 'Статус (визуальный)'
     status_badge.admin_order_field = 'publication_status'
 
     def get_queryset(self, request):

@@ -4,8 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-  <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="create fixture groups">
+  <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="refresh navbar">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/catalog/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/catalog/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/catalog/management/commands/load_test_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/catalog/management/commands/load_test_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/catalog/templates/catalog/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/catalog/templates/catalog/home.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/catalog/templates/catalog/includes/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/catalog/templates/catalog/includes/navbar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fixtures/products.json" beforeDir="false" afterPath="$PROJECT_DIR$/fixtures/products.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/models.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,7 +31,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="HW6.2" />
+        <entry key="$PROJECT_DIR$" value="HW7" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -49,14 +57,14 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;Python.test_crud.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;HW7&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "Python.test_crud.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "HW7.1"
   }
-}</component>
+}]]></component>
   <component name="RunManager">
     <configuration name="test_crud" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="DjangoShop" />
@@ -103,30 +111,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1748942637193</updated>
-    </task>
-    <task id="LOCAL-00007" summary="create admin panel">
-      <option name="closed" value="true" />
-      <created>1748950308541</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1748950308541</updated>
-    </task>
-    <task id="LOCAL-00008" summary="create views">
-      <option name="closed" value="true" />
-      <created>1748950378135</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1748950378135</updated>
-    </task>
-    <task id="LOCAL-00009" summary="create fixtures">
-      <option name="closed" value="true" />
-      <created>1748950497879</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1748950497879</updated>
     </task>
     <task id="LOCAL-00010" summary="create custom commands">
       <option name="closed" value="true" />
@@ -497,7 +481,31 @@
       <option name="project" value="LOCAL" />
       <updated>1750447292851</updated>
     </task>
-    <option name="localTasksCounter" value="56" />
+    <task id="LOCAL-00056" summary="make migrations">
+      <option name="closed" value="true" />
+      <created>1750447747115</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1750447747116</updated>
+    </task>
+    <task id="LOCAL-00057" summary="refresh views from blog">
+      <option name="closed" value="true" />
+      <created>1750447781390</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1750447781390</updated>
+    </task>
+    <task id="LOCAL-00058" summary="refresh navbar">
+      <option name="closed" value="true" />
+      <created>1750447819687</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1750447819687</updated>
+    </task>
+    <option name="localTasksCounter" value="59" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -524,9 +532,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="refresh contacts" />
-    <MESSAGE value="create blog and refresh settings" />
-    <MESSAGE value="create models from blog" />
     <MESSAGE value="create admin from blog" />
     <MESSAGE value="fixes for migrates" />
     <MESSAGE value="create views from blog" />
@@ -550,6 +555,9 @@
     <MESSAGE value="refresh models from catalog" />
     <MESSAGE value="reworks all homework" />
     <MESSAGE value="create fixture groups" />
-    <option name="LAST_COMMIT_MESSAGE" value="create fixture groups" />
+    <MESSAGE value="make migrations" />
+    <MESSAGE value="refresh views from blog" />
+    <MESSAGE value="refresh navbar" />
+    <option name="LAST_COMMIT_MESSAGE" value="refresh navbar" />
   </component>
 </project>
