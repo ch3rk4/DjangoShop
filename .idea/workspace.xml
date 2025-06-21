@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="refresh navbar">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/config/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
-    </list>
+    <list default="true" id="a44859b1-7059-42d8-9cdc-20b7b06cae1d" name="Changes" comment="refresh urls from catalog" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -17,8 +13,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="HTML File" />
         <option value="Python Script" />
+        <option value="HTML File" />
       </list>
     </option>
   </component>
@@ -105,30 +101,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1748942637193</updated>
-    </task>
-    <task id="LOCAL-00010" summary="create custom commands">
-      <option name="closed" value="true" />
-      <created>1748950667535</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1748950667535</updated>
-    </task>
-    <task id="LOCAL-00011" summary="refresh home.html">
-      <option name="closed" value="true" />
-      <created>1748950756094</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1748950756094</updated>
-    </task>
-    <task id="LOCAL-00012" summary="final">
-      <option name="closed" value="true" />
-      <created>1748951838958</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1748951838959</updated>
     </task>
     <task id="LOCAL-00013" summary="gitignore">
       <option name="closed" value="true" />
@@ -498,7 +470,31 @@
       <option name="project" value="LOCAL" />
       <updated>1750447819687</updated>
     </task>
-    <option name="localTasksCounter" value="59" />
+    <task id="LOCAL-00059" summary="refresh settings from config and create services">
+      <option name="closed" value="true" />
+      <created>1750517165042</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1750517165044</updated>
+    </task>
+    <task id="LOCAL-00060" summary="refresh views from catalog">
+      <option name="closed" value="true" />
+      <created>1750517264135</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1750517264136</updated>
+    </task>
+    <task id="LOCAL-00061" summary="refresh urls from catalog">
+      <option name="closed" value="true" />
+      <created>1750517306994</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1750517306994</updated>
+    </task>
+    <option name="localTasksCounter" value="62" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -525,9 +521,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="create admin from blog" />
-    <MESSAGE value="fixes for migrates" />
-    <MESSAGE value="create views from blog" />
     <MESSAGE value="create urls for blog" />
     <MESSAGE value="refresh urls from config" />
     <MESSAGE value="refresh forms" />
@@ -550,6 +543,9 @@
     <MESSAGE value="make migrations" />
     <MESSAGE value="refresh views from blog" />
     <MESSAGE value="refresh navbar" />
-    <option name="LAST_COMMIT_MESSAGE" value="refresh navbar" />
+    <MESSAGE value="refresh settings from config and create services" />
+    <MESSAGE value="refresh views from catalog" />
+    <MESSAGE value="refresh urls from catalog" />
+    <option name="LAST_COMMIT_MESSAGE" value="refresh urls from catalog" />
   </component>
 </project>
