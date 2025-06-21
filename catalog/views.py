@@ -56,11 +56,11 @@ class HomeView(ListView):
                 cache_key_suffix=cache_key_suffix
             )
 
-        # ИСПРАВЛЕНИЕ: Добавляем информацию о правах для каждого товара
+        # ИСПРАВЛЕНИЕ: Убираем подчеркивания из названий атрибутов
         for product in products:
-            product._can_edit = product.can_be_edited_by(self.request.user)
-            product._can_delete = product.can_be_deleted_by(self.request.user)
-            product._can_unpublish = product.can_be_unpublished_by(self.request.user)
+            product.can_edit = product.can_be_edited_by(self.request.user)
+            product.can_delete = product.can_be_deleted_by(self.request.user)
+            product.can_unpublish = product.can_be_unpublished_by(self.request.user)
 
         return products
 
@@ -129,7 +129,7 @@ class ProductDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['page_title'] = f'Товар: {self.object.name}'
 
-        # ИСПРАВЛЕНИЕ: Добавляем информацию о правах пользователя
+        # ИСПРАВЛЕНИЕ: Добавляем информацию о правах пользователя без подчеркиваний
         context['can_edit_product'] = self.object.can_be_edited_by(self.request.user)
         context['can_delete_product'] = self.object.can_be_deleted_by(self.request.user)
         context['can_unpublish_product'] = self.object.can_be_unpublished_by(self.request.user)
@@ -347,11 +347,11 @@ class CategoryProductsView(ListView):
             include_unpublished=False
         )
 
-        # ИСПРАВЛЕНИЕ: Добавляем информацию о правах для каждого товара
+        # ИСПРАВЛЕНИЕ: Убираем подчеркивания из названий атрибутов
         for product in products:
-            product._can_edit = product.can_be_edited_by(self.request.user)
-            product._can_delete = product.can_be_deleted_by(self.request.user)
-            product._can_unpublish = product.can_be_unpublished_by(self.request.user)
+            product.can_edit = product.can_be_edited_by(self.request.user)
+            product.can_delete = product.can_be_deleted_by(self.request.user)
+            product.can_unpublish = product.can_be_unpublished_by(self.request.user)
 
         return products
 
